@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.felnull.mekanismtweaks.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "mekanismtweaks.refmap.json",
+  "mixins": [
+    "DelayAccessor",
+    "MixinCachedRecipe",
+    "MixinFluidicPlenisher",
+    "MixinFormulaicAssemblicator",
+    "MixinHomoo",
+    "MixinMekanismUtils",
+    "MixinPump",
+    "MixinUpgrade",
+    "MixinUpgradeUtils"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
