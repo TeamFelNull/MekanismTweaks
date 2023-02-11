@@ -26,6 +26,18 @@ public class MixinMekanismUtils {
 
     /**
      * @author nin8995
+     * @reason extension and no energy upgrade effect
+     */
+    @Overwrite
+    public static FloatingLong getEnergyPerTick(IUpgradeTile tile, FloatingLong def) {
+        if (tile.supportsUpgrades()) {
+            return def.multiply(Utils.electricity(tile));
+        }
+        return def;
+    }
+
+    /**
+     * @author nin8995
      * @reason extension
      */
     @Overwrite
