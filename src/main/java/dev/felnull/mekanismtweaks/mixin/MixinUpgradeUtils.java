@@ -2,6 +2,7 @@ package dev.felnull.mekanismtweaks.mixin;
 
 import dev.felnull.mekanismtweaks.Utils;
 import mekanism.api.Upgrade;
+import mekanism.api.text.ILangEntry;
 import mekanism.common.MekanismLang;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.tile.interfaces.IUpgradeTile;
