@@ -1,11 +1,18 @@
 package dev.felnull.mekanismtweaks;
 
-// Variables for Mixin class
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
+
+// Variables for Mixin class (for mixin class doesn't allow static variable)
 public class Temp {
     public static String name;//remembering upgrade name
-    public static boolean isInjectingToCachedRecipe = false;//not to call injected method while operating injected method
-    public static boolean isInjectingToFormulaicAssemblicator = false;//not to call injected method while operating injected method
-    public static boolean isInjectingToFluidicPlenisher = false;//not to call injected method while operating injected method
-    public static boolean isInjectingToPump = false;//not to call injected method while operating injected method
-    public static boolean extractFlag = false;//to identify execute extract
+    public static final ThreadLocal<Boolean> isInjecting = ThreadLocal.withInitial(() -> false);//not to call injected method while operating injected method
+    public static final BiConsumer<Integer, Runnable> inject = (reqTime, process) -> {
+        if (!isInjecting.get()) {
+            isInjecting.set(true);
+            for (int i = reqTime; i < 0; i++)
+                process.run();
+            isInjecting.set(false);
+        }
+    };//Called on processes' ends, to process more while reqTime has negative value. For this also called on added processes' ends, uses isInjecting info.
 }

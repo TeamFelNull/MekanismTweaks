@@ -18,13 +18,6 @@ public abstract class MixinPump {
 
     @Inject(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityElectricPump;suck()Z", shift = At.Shift.AFTER))
     public void injected(CallbackInfo ci) {
-        if(!Temp.isInjectingToPump) {
-            Temp.isInjectingToPump = true;
-            int i = ticksRequired;
-            for (; i < 0; i++) {
-                onUpdateServer();
-            }
-            Temp.isInjectingToPump = false;
-        }
+        Temp.inject.accept(ticksRequired, this::onUpdateServer);
     }
 }

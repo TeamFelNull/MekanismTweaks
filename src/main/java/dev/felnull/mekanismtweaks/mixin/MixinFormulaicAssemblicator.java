@@ -11,19 +11,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = TileEntityFormulaicAssemblicator.class, remap = false)
 public abstract class MixinFormulaicAssemblicator {
 
-    @Shadow private int ticksRequired;
+    @Shadow
+    private int ticksRequired;
 
-    @Shadow protected abstract void onUpdateServer();
+    @Shadow
+    protected abstract void onUpdateServer();
 
     @Inject(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityFormulaicAssemblicator;doSingleCraft()Z", shift = At.Shift.AFTER))
     public void injected(CallbackInfo ci) {
-        if(!Temp.isInjectingToFormulaicAssemblicator) {
-            Temp.isInjectingToFormulaicAssemblicator = true;
-            int i = ticksRequired;
-            for (; i < 0; i++) {
-                onUpdateServer();
-            }
-            Temp.isInjectingToFormulaicAssemblicator = false;
-        }
+        Temp.inject.accept(ticksRequired, this::onUpdateServer);
     }
 }
