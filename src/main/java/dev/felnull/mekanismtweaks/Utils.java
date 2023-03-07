@@ -15,7 +15,7 @@ public class Utils {
     public static double electricity(IUpgradeTile tile) {
         int speed = tile.getComponent().getUpgrades(Upgrade.SPEED);
         int energy = tile.getComponent().getUpgrades(Upgrade.ENERGY);
-        return Math.pow(MekanismConfig.general.maxUpgradeMultiplier.get(), (2 * speed - (speed <= 8 ? Math.min(energy, 8) : Math.min(energy, speed))) / 8D);
+        return Math.pow(MekanismConfig.general.maxUpgradeMultiplier.get(), (2 * speed - Math.min(energy, Math.max(8, speed))) / 8D);
     }
 
     public static double capacity(IUpgradeTile tile) {
