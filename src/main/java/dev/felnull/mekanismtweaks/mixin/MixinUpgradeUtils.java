@@ -2,11 +2,12 @@ package dev.felnull.mekanismtweaks.mixin;
 
 import dev.felnull.mekanismtweaks.Utils;
 import mekanism.api.Upgrade;
+import mekanism.api.text.ILangEntry;
 import mekanism.common.MekanismLang;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.tile.interfaces.IUpgradeTile;
 import mekanism.common.util.UpgradeUtils;
-import net.minecraft.network.chat.Component;
+import net.minecraft.util.text.ITextComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
@@ -21,11 +22,10 @@ public class MixinUpgradeUtils {
      * @reason idk
      */
     @Overwrite
-    public static List<Component> getExpScaledInfo(IUpgradeTile tile, Upgrade upgrade) {
-        List<Component> ret = new ArrayList<>();
-        if (tile.supportsUpgrades() && upgrade.getMax() > 1) {
+    public static List<ITextComponent> getExpScaledInfo(IUpgradeTile tile, Upgrade upgrade) {
+        List<ITextComponent> ret = new ArrayList<>();
+        if (tile.supportsUpgrades() && upgrade.getMax() > 1)
             ret.add(MekanismLang.UPGRADES_EFFECT.translate(Utils.time(tile)));
-        }
         return ret;
     }
 
@@ -34,8 +34,8 @@ public class MixinUpgradeUtils {
      * @reason show on effect what double multiplied to time taken and energy storage
      */
     @Overwrite
-    public static List<Component> getMultScaledInfo(IUpgradeTile tile, Upgrade upgrade) {
-        List<Component> ret = new ArrayList<>();
+    public static List<ITextComponent> getMultScaledInfo(IUpgradeTile tile, Upgrade upgrade) {
+        List<ITextComponent> ret = new ArrayList<>();
         if (tile.supportsUpgrades() && upgrade.getMax() > 1) {
             double effect = upgrade == Upgrade.ENERGY ? Utils.capacity(tile) : upgrade == Upgrade.SPEED ? Utils.time(tile) : Math.pow(MekanismConfig.general.maxUpgradeMultiplier.get(), (float) tile.getComponent().getUpgrades(upgrade) / (float) upgrade.getMax());
             ret.add(MekanismLang.UPGRADES_EFFECT.translate(Utils.exponential(effect)));

@@ -13,7 +13,7 @@ public class MixinMekanismUtils {
 
     /**
      * @author nin8995
-     * @reason extension and translate multiple operations / tick as minus
+     * @reason translate multiple operations / tick as minus
      */
     @Overwrite
     public static int getTicks(IUpgradeTile tile, int def) {
@@ -26,13 +26,12 @@ public class MixinMekanismUtils {
 
     /**
      * @author nin8995
-     * @reason extension and no energy upgrade effect
+     * @reason extension and energy upgrade can affect like before till 8, after that cannot affect more than speed upgrade
      */
     @Overwrite
     public static FloatingLong getEnergyPerTick(IUpgradeTile tile, FloatingLong def) {
-        if (tile.supportsUpgrades()) {
+        if (tile.supportsUpgrades())
             return def.multiply(Utils.electricity(tile));
-        }
         return def;
     }
 
@@ -42,10 +41,8 @@ public class MixinMekanismUtils {
      */
     @Overwrite
     public static FloatingLong getMaxEnergy(IUpgradeTile tile, FloatingLong def) {
-        if (tile.supportsUpgrades()) {
-            var a = def.copy();
+        if (tile.supportsUpgrades())
             return def.multiply(Utils.capacity(tile));
-        }
         return def;
     }
 }
