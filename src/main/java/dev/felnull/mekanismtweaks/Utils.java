@@ -3,6 +3,7 @@ package dev.felnull.mekanismtweaks;
 import mekanism.api.Upgrade;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.tile.interfaces.IUpgradeTile;
+import net.minecraft.util.Mth;
 
 public class Utils {
 
@@ -15,7 +16,7 @@ public class Utils {
     public static double electricity(IUpgradeTile tile) {
         var speed = tile.getComponent().getUpgrades(Upgrade.SPEED);
         var energy = tile.getComponent().getUpgrades(Upgrade.ENERGY);
-        return Math.pow(MekanismConfig.general.maxUpgradeMultiplier.get(), (2 * speed - (speed <= 8 ? Math.min(energy, 8) : Math.min(energy, speed))) / 8D);
+        return Math.pow(MekanismConfig.general.maxUpgradeMultiplier.get(), (2 * speed - Math.min(energy, Math.max(8, speed))) / 8D);
     }
 
     public static double capacity(IUpgradeTile tile) {
