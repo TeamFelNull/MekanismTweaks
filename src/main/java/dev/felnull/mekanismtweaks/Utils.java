@@ -10,8 +10,11 @@ public class Utils {
         return Math.pow(MekanismConfig.general.maxUpgradeMultiplier.get(), tile.getComponent().getUpgrades(Upgrade.SPEED) / -8D);
     }
 
+
     public static double electricity(IUpgradeTile tile) {
-        return Math.pow(MekanismConfig.general.maxUpgradeMultiplier.get(), tile.getComponent().getUpgrades(Upgrade.SPEED) / 4D);
+        var speed = tile.getComponent().getUpgrades(Upgrade.SPEED);
+        var energy = tile.getComponent().getUpgrades(Upgrade.ENERGY);
+        return Math.pow(MekanismConfig.general.maxUpgradeMultiplier.get(), (2 * speed - (speed <= 8 ? Math.min(energy, 8) : Math.min(energy, speed))) / 8D);
     }
 
     public static double capacity(IUpgradeTile tile) {

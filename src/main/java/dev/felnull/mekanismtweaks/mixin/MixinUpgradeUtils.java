@@ -22,10 +22,9 @@ public class MixinUpgradeUtils {
      */
     @Overwrite
     public static List<Component> getExpScaledInfo(IUpgradeTile tile, Upgrade upgrade) {
-        List<Component> ret = new ArrayList<>();
-        if (tile.supportsUpgrades() && upgrade.getMax() > 1) {
+        var ret = new ArrayList<Component>();
+        if (tile.supportsUpgrades() && upgrade.getMax() > 1)
             ret.add(MekanismLang.UPGRADES_EFFECT.translate(Utils.time(tile)));
-        }
         return ret;
     }
 
@@ -35,9 +34,9 @@ public class MixinUpgradeUtils {
      */
     @Overwrite
     public static List<Component> getMultScaledInfo(IUpgradeTile tile, Upgrade upgrade) {
-        List<Component> ret = new ArrayList<>();
+        var ret = new ArrayList<Component>();
         if (tile.supportsUpgrades() && upgrade.getMax() > 1) {
-            double effect = upgrade == Upgrade.ENERGY ? Utils.capacity(tile) : upgrade == Upgrade.SPEED ? Utils.time(tile) : Math.pow(MekanismConfig.general.maxUpgradeMultiplier.get(), (float) tile.getComponent().getUpgrades(upgrade) / (float) upgrade.getMax());
+            var effect = upgrade == Upgrade.ENERGY ? Utils.capacity(tile) : upgrade == Upgrade.SPEED ? Utils.time(tile) : Math.pow(MekanismConfig.general.maxUpgradeMultiplier.get(), (float) tile.getComponent().getUpgrades(upgrade) / (float) upgrade.getMax());
             ret.add(MekanismLang.UPGRADES_EFFECT.translate(Utils.exponential(effect)));
         }
         return ret;

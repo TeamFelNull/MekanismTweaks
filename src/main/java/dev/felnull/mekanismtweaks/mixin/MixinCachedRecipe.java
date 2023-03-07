@@ -15,18 +15,14 @@ import java.util.function.IntSupplier;
 @Mixin(value = CachedRecipe.class, remap = false)
 public abstract class MixinCachedRecipe {
 
-    @Shadow public abstract void process();
+    @Shadow
+    public abstract void process();
 
-    @Shadow private IntSupplier requiredTicks;
+    @Shadow
+    private IntSupplier requiredTicks;
 
     @Inject(method = "process", at = @At(value = "INVOKE", target = "Lmekanism/api/recipes/cache/CachedRecipe;finishProcessing(I)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
     private void injected(CallbackInfo ci, int operations) {
-        if(!Temp.isInjectingToCachedRecipe) {
-            Temp.isInjectingToCachedRecipe = true;
-            var i = requiredTicks.getAsInt();
-            for(;i < 0; i++)
-                process();
-            Temp.isInjectingToCachedRecipe = false;
-        }
+        Temp.inject.accept(requiredTicks.getAsInt(), this::process);
     }
 }

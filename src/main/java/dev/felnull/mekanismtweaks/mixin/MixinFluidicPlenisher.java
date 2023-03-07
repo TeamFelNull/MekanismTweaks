@@ -12,19 +12,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = TileEntityFluidicPlenisher.class, remap = false)
 public abstract class MixinFluidicPlenisher {
 
-    @Shadow public int ticksRequired;
+    @Shadow
+    public int ticksRequired;
 
-    @Shadow protected abstract void onUpdateServer();
+    @Shadow
+    protected abstract void onUpdateServer();
 
     @Inject(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityFluidicPlenisher;doPlenish()V", shift = At.Shift.AFTER))
     public void injected(CallbackInfo ci) {
-        if(!Temp.isInjectingToFluidicPlenisher) {
-            Temp.isInjectingToFluidicPlenisher = true;
-            int i = ticksRequired;
-            for (; i < 0; i++) {
-                onUpdateServer();
-            }
-            Temp.isInjectingToFluidicPlenisher = false;
-        }
+        Temp.inject.accept(ticksRequired, this::onUpdateServer);
     }
 }

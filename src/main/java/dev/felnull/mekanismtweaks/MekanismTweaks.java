@@ -8,5 +8,6 @@ public class MekanismTweaks {
 
     public static final String MODID = "mekanismtweaks";
 
-    public MekanismTweaks() {}
+    public MekanismTweaks() {
+    }
 }
