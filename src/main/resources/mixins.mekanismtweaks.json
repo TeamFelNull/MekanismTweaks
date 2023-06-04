@@ -1,0 +1,24 @@
+{
+  "compatibilityLevel": "JAVA_8",
+  "package": "dev.felnull.mekanismtweaks.mixin",
+  "refmap": "refmap.mekanismtweaks.json",
+  "mixins": [
+    "MixinAdvancedElectricMachine",
+    "MixinChanceMachine",
+    "MixinChemicalCrystallizer",
+    "MixinChemicalDissolutionChamber",
+    "MixinChemicalOxidizer",
+    "MixinElectricMachine",
+    "MixinFactory",
+    "MixinFluidicPlenisher",
+    "MixinFormulaicAssemblicator",
+    "MixinHomoo",
+    "MixinMekanismUtils",
+    "MixinMetallurgicInfuser",
+    "MixinPump",
+    "MixinUpgrade"
+  ],
+  "client": [
+  ],
+  "server": []
+}

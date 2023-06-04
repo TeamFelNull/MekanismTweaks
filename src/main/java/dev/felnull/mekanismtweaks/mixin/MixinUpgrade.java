@@ -1,22 +1,68 @@
 package dev.felnull.mekanismtweaks.mixin;
 
-import dev.felnull.mekanismtweaks.Temp;
-import mekanism.api.Upgrade;
+import dev.felnull.mekanismtweaks.Utils;
+import mekanism.common.Upgrade;
+import mekanism.common.base.IUpgradeTile;
+import mekanism.common.config.MekanismConfig;
+import mekanism.common.util.LangUtils;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(value = Upgrade.class)
+import java.util.ArrayList;
+import java.util.List;
+
+@Mixin(value = Upgrade.class, remap = false)
 public abstract class MixinUpgrade {
 
-    @ModifyVariable(method = "<init>", at = @At("HEAD"), ordinal = 1, argsOnly = true)
-    private static String getName(String s) {
-        Temp.name = s;
-        return s;
+    @Shadow
+    public abstract boolean canMultiply();
+
+    @Shadow
+    private int maxStack;
+
+    /**
+     * @author nin8995
+     * @reason wrap max stack size
+     */
+    @Overwrite
+    public int getMax() {
+        Upgrade upgrade = (Upgrade) (Object) this;
+        return upgrade == Upgrade.SPEED || upgrade == Upgrade.ENERGY ? 64 : maxStack;
     }
 
-    @ModifyVariable(method = "<init>", at = @At("HEAD"), ordinal = 1, argsOnly = true)
-    private static int toFullStack(int i) {
-        return Temp.name.equals("speed") || Temp.name.equals("energy") ? 64 : i;
+    /**
+     * @author ni8995
+     * @reason idk
+     */
+    @Overwrite
+    public List<String> getExpScaledInfo(IUpgradeTile tile) {
+        List<String> ret = new ArrayList<>();
+        if (canMultiply()) {
+            ret.add(LangUtils.localize("gui.upgrades.effect") + ": " + Utils.time(tile) + "x");
+        }
+
+        return ret;
+    }
+
+    /**
+     * @author nin8995
+     * @reason show on effect what double multiplied to time taken and energy storage
+     */
+    @Overwrite
+    public List<String> getMultScaledInfo(IUpgradeTile tile) {
+        List<String> ret = new ArrayList<>();
+        Upgrade upgrade = (Upgrade) (Object) this;
+        if (this.canMultiply()) {
+            double effect =
+                    upgrade == Upgrade.ENERGY
+                    ? Utils.capacity(tile)
+                    : upgrade == Upgrade.SPEED
+                      ? Utils.time(tile)
+                      : Math.pow(MekanismConfig.current().general.maxUpgradeMultiplier.val(), (float) tile.getComponent().getUpgrades(upgrade) / (float) getMax());
+            ret.add(LangUtils.localize("gui.upgrades.effect") + ": " + Utils.exponential(effect) + "x");
+        }
+
+        return ret;
     }
 }

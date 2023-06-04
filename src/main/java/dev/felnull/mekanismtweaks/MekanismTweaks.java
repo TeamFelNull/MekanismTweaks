@@ -1,12 +1,40 @@
 package dev.felnull.mekanismtweaks;
 
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import org.spongepowered.asm.launch.MixinBootstrap;
 
+import javax.annotation.Nullable;
+import java.util.Map;
 
-@Mod(MekanismTweaks.MODID)
-public class MekanismTweaks {
+@IFMLLoadingPlugin.Name("MekanismTweaks")
+public class MekanismTweaks implements IFMLLoadingPlugin {
 
-    public static final String MODID = "mekanismtweaks";
+    public MekanismTweaks() {
+        MixinBootstrap.init();
+    }
 
-    public MekanismTweaks() {}
+    @Override
+    public String[] getASMTransformerClass() {
+        return new String[0];
+    }
+
+    @Override
+    public String getModContainerClass() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public String getSetupClass() {
+        return null;
+    }
+
+    @Override
+    public void injectData(Map<String, Object> data) {
+    }
+
+    @Override
+    public String getAccessTransformerClass() {
+        return null;
+    }
 }

@@ -1,9 +1,7 @@
 package dev.felnull.mekanismtweaks.mixin;
 
 import dev.felnull.mekanismtweaks.Utils;
-import mekanism.api.math.FloatingLong;
-import mekanism.api.math.MathUtils;
-import mekanism.common.tile.interfaces.IUpgradeTile;
+import mekanism.common.base.IUpgradeTile;
 import mekanism.common.util.MekanismUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -17,11 +15,8 @@ public class MixinMekanismUtils {
      */
     @Overwrite
     public static int getTicks(IUpgradeTile tile, int def) {
-        if (tile.supportsUpgrades()) {
-            double d = def * Utils.time(tile);
-            return d >= 1 ? MathUtils.clampToInt(d) : MathUtils.clampToInt(1 / d) * -1;
-        }
-        return def;
+        double d = def * Utils.time(tile);
+        return d >= 1 ? Utils.clampToInt(d) : Utils.clampToInt(1 / d) * -1;
     }
 
     /**
@@ -29,10 +24,8 @@ public class MixinMekanismUtils {
      * @reason extension and energy upgrade can affect like before till 8, after that cannot affect more than speed upgrade
      */
     @Overwrite
-    public static FloatingLong getEnergyPerTick(IUpgradeTile tile, FloatingLong def) {
-        if (tile.supportsUpgrades())
-            return def.multiply(Utils.electricity(tile));
-        return def;
+    public static double getEnergyPerTick(IUpgradeTile tile, double def) {
+        return def * Utils.electricity(tile);
     }
 
     /**
@@ -40,9 +33,7 @@ public class MixinMekanismUtils {
      * @reason extension
      */
     @Overwrite
-    public static FloatingLong getMaxEnergy(IUpgradeTile tile, FloatingLong def) {
-        if (tile.supportsUpgrades())
-            return def.multiply(Utils.capacity(tile));
-        return def;
+    public static double getMaxEnergy(IUpgradeTile tile, double def) {
+        return def * Utils.capacity(tile);
     }
 }

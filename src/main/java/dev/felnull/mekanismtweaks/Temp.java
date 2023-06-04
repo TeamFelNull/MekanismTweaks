@@ -1,7 +1,6 @@
 package dev.felnull.mekanismtweaks;
 
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 // Variables for Mixin class (for mixin class doesn't allow static variable)
 public class Temp {

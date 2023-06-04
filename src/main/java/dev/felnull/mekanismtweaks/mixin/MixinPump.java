@@ -1,7 +1,7 @@
 package dev.felnull.mekanismtweaks.mixin;
 
 import dev.felnull.mekanismtweaks.Temp;
-import mekanism.common.tile.machine.TileEntityElectricPump;
+import mekanism.common.tile.TileEntityElectricPump;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,10 +14,11 @@ public abstract class MixinPump {
     @Shadow
     public int ticksRequired;
 
-    @Shadow protected abstract void onUpdateServer();
+    @Shadow
+    public abstract void onUpdate();
 
-    @Inject(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityElectricPump;suck()Z", shift = At.Shift.AFTER))
+    @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityElectricPump;suck(Z)Z", shift = At.Shift.AFTER))
     public void injected(CallbackInfo ci) {
-        Temp.inject.accept(ticksRequired, this::onUpdateServer);
+        Temp.inject.accept(ticksRequired, this::onUpdate);
     }
 }
