@@ -18,6 +18,6 @@ public abstract class MixinChemicalCrystallizer {
 
     @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityChemicalCrystallizer;operate(Lmekanism/common/recipe/machines/CrystallizerRecipe;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
     private void injected(CallbackInfo ci) {
-        Temp.inject.accept(((TileEntityOperationalMachine) (Object) this).ticksRequired, this::onUpdate);
+        Temp.inject(((TileEntityOperationalMachine) (Object) this).ticksRequired, this::onUpdate);
     }
 }

@@ -21,6 +21,6 @@ public abstract class MixinFactory {
 
     @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityFactory;operate(II)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
     private void injected(CallbackInfo ci) {
-        Temp.inject.accept(ticksRequired, this::onUpdate);
+        Temp.inject(ticksRequired, this::onUpdate);
     }
 }

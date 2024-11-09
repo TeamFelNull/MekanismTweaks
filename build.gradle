@@ -1,8 +1,11 @@
 buildscript {
     repositories {
-        mavenCentral()
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        maven {
+            name "forge"
+            url "https://files.minecraftforge.net/maven"
+        }
+
         maven { url = "https://repo.spongepowered.org/maven" }
     }
     dependencies {
@@ -16,7 +19,7 @@ apply plugin: 'eclipse'
 
 version = mod_version
 group = mod_group
-archivesBaseName = mod_id
+archivesBaseName = "$mod_id-$minecraft_version"
 
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
@@ -24,15 +27,9 @@ compileJava {
 }
 
 minecraft {
-    version = "${minecraft_version}-${forge_version}"
+    version "1.12.2-14.23.5.2847"
     runDir = "run"
     mappings = mappings_version
-    String resolved_core_plugin = mod_core_plugin.replace('${mod_group}', mod_group).replace('${mod_id}', mod_id)
-    clientJvmArgs += "-Dfml.coreMods.load=${resolved_core_plugin}"
-    serverJvmArgs += "-Dfml.coreMods.load=${resolved_core_plugin}"
-    String resolved_core_config = mod_mixin_configs.replace('${mod_id}', mod_id)
-    clientRunArgs += "--mixin ${resolved_core_config}"
-    serverRunArgs += "--mixin ${resolved_core_config}"
 }
 
 repositories {
@@ -47,6 +44,11 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
     }
+
+    maven {
+        name 'ForgeFS'
+        url 'https://maven.minecraftforge.net/'
+    }
 }
 
 configurations {
@@ -55,6 +57,7 @@ configurations {
 }
 
 dependencies {
+
     embed('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
         exclude module: 'guava'
         exclude module: 'commons-io'
@@ -90,14 +93,21 @@ jar {
     from(configurations.embed.collect {
         it.isDirectory() ? it : zipTree(it)
     }) {
-        exclude "LICENSE.txt", "META-INF/MANIFSET.MF", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
+        exclude "LICENSE.txt", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
     }
 
     manifest {
-        attributes "FMLCorePlugin": mod_core_plugin.replace('${mod_group}', mod_group).replace('${mod_id}', mod_id)
-        attributes "FMLCorePluginContainsFMLMod": "true"
-        attributes "TweakClass": "org.spongepowered.asm.launch.MixinTweaker"
-        attributes "TweakOrder": "0"
-        attributes "MixinConfigs": mod_mixin_configs.replace('${mod_id}', mod_id)
+        attributes(
+                "FMLCorePlugin": mod_core_plugin.replace('${mod_group}', mod_group),
+                "FMLCorePluginContainsFMLMod": "true",
+                "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
+                "MixinConfigs": mod_mixin_configs.replace('${mod_id}', mod_id),
+
+                // ここでModに必要な情報を追加
+                "ModID": mod_id, // modidとしてmodの名前を使用
+                "ModName": mod_name, // モッド名
+                "Version": mod_version, // モッドのバージョン
+                "Description": mod_description
+        )
     }
 }

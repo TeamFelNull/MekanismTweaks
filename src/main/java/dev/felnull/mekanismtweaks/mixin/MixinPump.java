@@ -19,6 +19,6 @@ public abstract class MixinPump {
 
     @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityElectricPump;suck(Z)Z", shift = At.Shift.AFTER))
     public void injected(CallbackInfo ci) {
-        Temp.inject.accept(ticksRequired, this::onUpdate);
+        Temp.inject(ticksRequired, this::onUpdate);
     }
 }

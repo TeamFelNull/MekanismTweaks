@@ -18,14 +18,20 @@ public abstract class MixinHomoo {
     @Shadow
     public abstract void onUpdate();
 
-    @Inject(method = "onUpdate",
-            at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityDigitalMiner;add(Ljava/util/List;)V"))
-    public void injected(CallbackInfo ci) {
-        Temp.injectHomoo.accept(delayLength, this::onUpdate);
-    }
-
+    /**
+     * Inject multiple operations where no bugs occur.
+     */
     @Inject(method = "onUpdate",
             at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityDigitalMiner;getDelay()I"))
+    public void injected(CallbackInfo ci) {
+        Temp.injectHomoo(delayLength, this::onUpdate);
+    }
+
+    /**
+     * Inject operation verification.
+     */
+    @Inject(method = "onUpdate",
+            at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityDigitalMiner;add(Ljava/util/List;)V"))
     public void injectProcessed(CallbackInfo ci) {
         Temp.processed.set(true);
     }

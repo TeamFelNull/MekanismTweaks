@@ -20,6 +20,6 @@ public abstract class MixinFluidicPlenisher {
 
     @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityFluidicPlenisher;doPlenish()V", shift = At.Shift.AFTER))
     public void injected(CallbackInfo ci) {
-        Temp.inject.accept(ticksRequired, this::onUpdate);
+        Temp.inject(ticksRequired, this::onUpdate);
     }
 }

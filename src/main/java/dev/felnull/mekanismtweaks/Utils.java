@@ -4,6 +4,9 @@ import mekanism.common.Upgrade;
 import mekanism.common.base.IUpgradeTile;
 import mekanism.common.config.MekanismConfig;
 
+/**
+ * 雑
+ */
 public class Utils {
 
     public static double time(IUpgradeTile tile) {
@@ -13,7 +16,7 @@ public class Utils {
     public static double electricity(IUpgradeTile tile) {
         double speed = frac(tile, Upgrade.SPEED);
         double energy = frac(tile, Upgrade.ENERGY);
-        return effect(2 * speed - Math.min(energy, Math.max(Config.freeEnergy, speed)));
+        return effect(2 * speed - Math.min(energy, Math.max(MekanismTweaks.freeEnergy / 8D, speed)));
     }
 
     public static double capacity(IUpgradeTile tile) {

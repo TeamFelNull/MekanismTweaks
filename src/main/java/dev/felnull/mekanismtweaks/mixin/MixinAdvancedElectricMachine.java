@@ -18,6 +18,6 @@ public abstract class MixinAdvancedElectricMachine {
 
     @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/prefab/TileEntityAdvancedElectricMachine;operate(Lmekanism/common/recipe/machines/AdvancedMachineRecipe;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
     private void injected(CallbackInfo ci) {
-        Temp.inject.accept(((TileEntityOperationalMachine) (Object) this).ticksRequired, this::onUpdate);
+        Temp.inject(((TileEntityOperationalMachine) (Object) this).ticksRequired, this::onUpdate);
     }
 }

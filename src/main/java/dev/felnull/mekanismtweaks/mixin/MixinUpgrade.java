@@ -1,6 +1,6 @@
 package dev.felnull.mekanismtweaks.mixin;
 
-import dev.felnull.mekanismtweaks.Config;
+import dev.felnull.mekanismtweaks.MekanismTweaks;
 import dev.felnull.mekanismtweaks.Utils;
 import mekanism.common.Upgrade;
 import mekanism.common.base.IUpgradeTile;
@@ -23,17 +23,17 @@ public abstract class MixinUpgrade {
 
     /**
      * @author nin8995
-     * @reason wrap max stack size
+     * @reason Wrap MaxStackSize and UpgradesInstalled.
      */
     @Overwrite
     public int getMax() {
         Upgrade upgrade = (Upgrade) (Object) this;
-        return (upgrade == Upgrade.SPEED ? Config.maxSpeed : upgrade == Upgrade.ENERGY ? Config.maxEnergy : maxStack);
+        return (upgrade == Upgrade.SPEED ? MekanismTweaks.maxSpeed : upgrade == Upgrade.ENERGY ? MekanismTweaks.maxEnergy : maxStack);
     }
 
     /**
      * @author nin8995
-     * @reason show effect double
+     * @reason Display effect cleanly, exponentially.
      */
     @Overwrite
     public List<String> getMultScaledInfo(IUpgradeTile tile) {

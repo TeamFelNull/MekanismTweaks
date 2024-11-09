@@ -11,17 +11,17 @@ public class MixinMekanismUtils {
 
     /**
      * @author nin8995
-     * @reason translate multiple operations / tick as minus
+     * @reason Extend speed effect exponentially. If performing more than one operation within a single tick, treat the excess operations as negative ticks required.
      */
     @Overwrite
     public static int getTicks(IUpgradeTile tile, int def) {
         double d = def * Utils.time(tile);
-        return d >= 1 ? Utils.clampToInt(d) : -Utils.clampToInt(1 / d);
+        return Utils.clampToInt(d >= 1 ? d : -1 / d);
     }
 
     /**
      * @author nin8995
-     * @reason extension and energy upgrade can affect like before till 8, after that cannot affect more than speed upgrade
+     * @reason Extend energy saving effect exponentially, subject to the freeEnergy limitation.
      */
     @Overwrite
     public static double getEnergyPerTick(IUpgradeTile tile, double def) {
@@ -30,7 +30,7 @@ public class MixinMekanismUtils {
 
     /**
      * @author nin8995
-     * @reason extension
+     * @reason Extend energy buffer effect exponentially.
      */
     @Overwrite
     public static double getMaxEnergy(IUpgradeTile tile, double def) {

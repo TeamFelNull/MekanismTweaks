@@ -20,6 +20,6 @@ public abstract class MixinChemicalDissolutionChamber {
 
     @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityChemicalDissolutionChamber;operate(Lmekanism/common/recipe/machines/DissolutionRecipe;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
     private void injected(CallbackInfo ci) {
-        Temp.inject.accept(ticksRequired, this::onUpdate);
+        Temp.inject(ticksRequired, this::onUpdate);
     }
 }
