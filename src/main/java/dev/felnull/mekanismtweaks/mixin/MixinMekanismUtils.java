@@ -16,7 +16,7 @@ public class MixinMekanismUtils {
     @Overwrite
     public static int getTicks(IUpgradeTile tile, int def) {
         double d = def * Utils.time(tile);
-        return d >= 1 ? Utils.clampToInt(d) : Utils.clampToInt(1 / d) * -1;
+        return d >= 1 ? Utils.clampToInt(d) : -Utils.clampToInt(1 / d);
     }
 
     /**

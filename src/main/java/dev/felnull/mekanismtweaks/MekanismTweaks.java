@@ -1,9 +1,13 @@
 package dev.felnull.mekanismtweaks;
 
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.spongepowered.asm.launch.MixinBootstrap;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.util.Map;
 
 @IFMLLoadingPlugin.Name("MekanismTweaks")

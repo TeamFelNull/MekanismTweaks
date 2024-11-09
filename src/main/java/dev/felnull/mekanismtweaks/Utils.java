@@ -7,17 +7,26 @@ import mekanism.common.config.MekanismConfig;
 public class Utils {
 
     public static double time(IUpgradeTile tile) {
-        return Math.pow(MekanismConfig.current().general.maxUpgradeMultiplier.val(), tile.getComponent().getUpgrades(Upgrade.SPEED) / -8D);
+        return effect(-frac(tile, Upgrade.SPEED));
     }
 
     public static double electricity(IUpgradeTile tile) {
-        int speed = tile.getComponent().getUpgrades(Upgrade.SPEED);
-        int energy = tile.getComponent().getUpgrades(Upgrade.ENERGY);
-        return Math.pow(MekanismConfig.current().general.maxUpgradeMultiplier.val(), (2 * speed - Math.min(energy, Math.max(8, speed))) / 8D);
+        double speed = frac(tile, Upgrade.SPEED);
+        double energy = frac(tile, Upgrade.ENERGY);
+        return effect(2 * speed - Math.min(energy, Math.max(Config.freeEnergy, speed)));
     }
 
     public static double capacity(IUpgradeTile tile) {
-        return Math.pow(MekanismConfig.current().general.maxUpgradeMultiplier.val(), tile.getComponent().getUpgrades(Upgrade.ENERGY) / 8D);
+        return effect(frac(tile, Upgrade.ENERGY));
+    }
+
+    public static double frac(IUpgradeTile tile, Upgrade upgrade) {
+        double stack = upgrade == Upgrade.SPEED || upgrade == Upgrade.ENERGY ? 8 : upgrade.getMax();
+        return tile.getComponent().getUpgrades(upgrade) / stack;
+    }
+
+    public static double effect(double d) {
+        return Math.pow(MekanismConfig.current().general.maxUpgradeMultiplier.val(), d);
     }
 
     public static String exponential(double d) {

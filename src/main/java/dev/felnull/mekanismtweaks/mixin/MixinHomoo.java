@@ -19,9 +19,15 @@ public abstract class MixinHomoo {
     public abstract void onUpdate();
 
     @Inject(method = "onUpdate",
-            at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityDigitalMiner;getDelay()I"))
+            at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityDigitalMiner;add(Ljava/util/List;)V"))
     public void injected(CallbackInfo ci) {
-        Temp.inject.accept(delayLength, this::onUpdate);
+        Temp.injectHomoo.accept(delayLength, this::onUpdate);
+    }
+
+    @Inject(method = "onUpdate",
+            at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityDigitalMiner;getDelay()I"))
+    public void injectProcessed(CallbackInfo ci) {
+        Temp.processed.set(true);
     }
 
     /**
