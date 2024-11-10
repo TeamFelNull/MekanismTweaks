@@ -1,18 +1,16 @@
 [
   {
-    "modid": "mekanismtweaks",
-    "name": "MekanismTweaks",
-    "description": "Higher Consumption, Higher Performance",
-    "version": "1.2",
-    "mcversion": "1.12.2",
+    "modid": "${mod_id}",
+    "name": "${mod_name}",
+    "description": "${mod_description}",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
     "url": "",
     "updateUrl": "",
-    "authorList": [
-      "nin8995"
-    ],
+    "authorList": ${mod_author},
     "credits": "",
     "logoFile": "",
     "screenshots": [],
-    "dependencies": ["required:forge@[14.23.5.2847,)"]
+    "dependencies": []
   }
 ]

@@ -90,24 +90,10 @@ mixin {
 }
 
 jar {
-    from(configurations.embed.collect {
-        it.isDirectory() ? it : zipTree(it)
-    }) {
-        exclude "LICENSE.txt", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
-    }
-
     manifest {
         attributes(
                 "FMLCorePlugin": mod_core_plugin.replace('${mod_group}', mod_group),
                 "FMLCorePluginContainsFMLMod": "true",
-                "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
-                "MixinConfigs": mod_mixin_configs.replace('${mod_id}', mod_id),
-
-                // ここでModに必要な情報を追加
-                "ModID": mod_id, // modidとしてmodの名前を使用
-                "ModName": mod_name, // モッド名
-                "Version": mod_version, // モッドのバージョン
-                "Description": mod_description
         )
     }
 }

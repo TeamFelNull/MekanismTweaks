@@ -3,7 +3,7 @@
   "compatibilityLevel": "JAVA_8",
   "minVersion": "0.7.11",
   "package": "dev.felnull.mekanismtweaks.mixin",
-  "refmap": "refmap.mekanismtweaks.json",
+  "refmap": "mixins.mekanismtweaks.refmap.json",
   "mixins": [
     "MixinAdvancedElectricMachine",
     "MixinChanceMachine",
