@@ -1,13 +1,15 @@
 package dev.felnull.mekanismtweaks.mixin;
 
 import dev.felnull.mekanismtweaks.MekanismTweaks;
-import dev.felnull.mekanismtweaks.Utils;
+import dev.felnull.mekanismtweaks.UpgradeEffect;
 import mekanism.common.Upgrade;
 import mekanism.common.base.IUpgradeTile;
 import mekanism.common.util.LangUtils;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,28 +24,33 @@ public abstract class MixinUpgrade {
     private int maxStack;
 
     /**
-     * @author nin8995
-     * @reason Wrap MaxStackSize and UpgradesInstalled.
+     * Wrap MaxStackSize and MaxUpgradesInstalled.
      */
-    @Overwrite
-    public int getMax() {
+    @Inject(method = "getMax", at = @At("HEAD"), cancellable = true)
+    public void getMax(CallbackInfoReturnable<Integer> cir) {
         Upgrade upgrade = (Upgrade) (Object) this;
-        return (upgrade == Upgrade.SPEED ? MekanismTweaks.maxSpeed : upgrade == Upgrade.ENERGY ? MekanismTweaks.maxEnergy : maxStack);
+        cir.setReturnValue(upgrade == Upgrade.SPEED ? MekanismTweaks.maxSpeed :
+                           upgrade == Upgrade.ENERGY ? MekanismTweaks.maxEnergy :
+                           upgrade == Upgrade.GAS ? MekanismTweaks.maxGas :
+                           maxStack);
+        cir.cancel();
     }
 
     /**
-     * @author nin8995
-     * @reason Display effect cleanly, exponentially.
+     * Display effect cleanly, exponentially. As to saving-effect Upgrade, display saving-effect value.
      */
-    @Overwrite
-    public List<String> getMultScaledInfo(IUpgradeTile tile) {
+    @Inject(method = "getMultScaledInfo", at = @At(value = "HEAD"), cancellable = true)
+    public void getMultScaledInfo(IUpgradeTile tile, CallbackInfoReturnable<List<String>> cir) {
         List<String> ret = new ArrayList<>();
         Upgrade upgrade = (Upgrade) (Object) this;
         if (this.canMultiply()) {
-            double effect = Utils.effect(Utils.frac(tile, upgrade));
-            ret.add(LangUtils.localize("gui.upgrades.effect") + ": " + Utils.exponential(effect) + "x");
+            double effect = UpgradeEffect.effect(
+                    upgrade == Upgrade.ENERGY || upgrade == Upgrade.GAS ? UpgradeEffect.decayed(tile, upgrade) :
+                    UpgradeEffect.fraction(tile, upgrade));
+            ret.add(LangUtils.localize("gui.upgrades.effect") + ": " + UpgradeEffect.exponential(effect) + "x");
         }
 
-        return ret;
+        cir.setReturnValue(ret);
+        cir.cancel();
     }
 }

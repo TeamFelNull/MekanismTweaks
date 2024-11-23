@@ -1,7 +1,7 @@
-package dev.felnull.mekanismtweaks.mixin;
+package dev.felnull.mekanismtweaks.mixin.operate;
 
 import dev.felnull.mekanismtweaks.Temp;
-import mekanism.common.tile.TileEntityChanceMachine;
+import mekanism.common.tile.TileEntityChemicalCrystallizer;
 import mekanism.common.tile.prefab.TileEntityOperationalMachine;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -10,13 +10,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-@Mixin(value = TileEntityChanceMachine.class, remap = false)
-public abstract class MixinChanceMachine {
+@Mixin(value = TileEntityChemicalCrystallizer.class, remap = false)
+public abstract class ChemicalCrystallizer {
 
     @Shadow
     public abstract void onUpdate();
 
-    @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityChanceMachine;operate(Lmekanism/common/recipe/machines/ChanceMachineRecipe;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityChemicalCrystallizer;operate(Lmekanism/common/recipe/machines/CrystallizerRecipe;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
     private void injected(CallbackInfo ci) {
         Temp.inject(((TileEntityOperationalMachine) (Object) this).ticksRequired, this::onUpdate);
     }

@@ -19,7 +19,12 @@ public class MekanismTweaks implements IFMLLoadingPlugin {
      */
     public static int maxSpeed;
     public static int maxEnergy;
+    public static int maxGas;
+    public static boolean energyBuffer;
     public static int freeEnergy;
+    public static int freeGas;
+    public static float sustEnergy;
+    public static float sustGas;
 
     static {
         File configFile = new File("config/mekanismtweaks.cfg");//load before MekanismItems class to change MaxStackSize
@@ -27,11 +32,20 @@ public class MekanismTweaks implements IFMLLoadingPlugin {
         config.load();
         String category = "general";
         config.setCategoryComment(category,
-                "Restart after each change, as this determines MaxStackSize of ItemUpgrade.\n" +
-                        "To change the effect per 8 UpgradesInstalled, you can adjust UpgradeModifier in mekanism.cfg.");
-        maxSpeed = config.getInt("maxSpeed", category, 64, 0, Integer.MAX_VALUE, "Max SpeedUpgradesInstalled.");
-        maxEnergy = config.getInt("maxEnergy", category, 64, 0, Integer.MAX_VALUE, "Max EnergyUpgradesInstalled.");
-        freeEnergy = config.getInt("freeEnergy", category, 8, 0, Integer.MAX_VALUE, "Max free EnergyUpgradesInstalled. Any additional upgrades will require equal or greater SpeedUpgradesInstalled to save energy, although the energy buffer will still increase regardless.");
+                "To change the effect per 8 UpgradesInstalled, you can adjust UpgradeModifier in mekanism.cfg.\n" +
+                        "Restart after each change, as this determines MaxStackSize of ItemUpgrade.");
+        maxSpeed = config.getInt("maxSpeed", category, 256, 0, Integer.MAX_VALUE, "MaxSpeedUpgradesInstalled.");
+        maxEnergy = config.getInt("maxEnergy", category, 256, 0, Integer.MAX_VALUE, "MaxEnergyUpgradesInstalled.");
+        maxGas = config.getInt("maxGas", category, 256, 0, Integer.MAX_VALUE, "Max GasUpgradesInstalled.");
+        energyBuffer = config.getBoolean("energyBuffer", category, true, "Avoid excessive energy buffer.");
+        freeEnergy = config.getInt("freeEnergy", category, 8, 0, Integer.MAX_VALUE, "The minimum guaranteed amount of EnergyUpgrades that has energy-saving effect without decay.");
+        freeGas = config.getInt("freeGas", category, 8, -1, Integer.MAX_VALUE,"The minimum guaranteed amount of GasUpgrades that has gas-saving effect without decay.");
+        sustEnergy = config.getFloat("sustEnergy", category, .5F, 0, 1,
+                        "At 1, the effect is fully sustained, just like freeEnergy equals maxEnergy, as per vanilla mekanism. At 0, no effect is sustained, as per version 1.1.\n" +
+                                "At 0.5, to overcome SpeedUpgradesInstalled, EnergyUpgradesInstalled more than or equal to its square is required. At 0.25, its cube is required. And so on.\n");
+        sustGas = config.getFloat("sustGas", category, .5F, 0, 1,
+                "At 1, the effect is fully sustained, just like freeGas equals maxGas, as per vanilla mekanism. At 0, no effect is sustained, as per version 1.1.\n" +
+                        "At 0.5, to overcome SpeedUpgradesInstalled, GasUpgradesInstalled more than or equal to its square is required. At 0.25, its cube is required. And so on.\n");
         config.save();
     }
 
@@ -40,7 +54,7 @@ public class MekanismTweaks implements IFMLLoadingPlugin {
      */
     public MekanismTweaks() {
         MixinBootstrap.init();
-        MixinEnvironment.getDefaultEnvironment().addConfiguration("mixins.mekanismtweaks.json");
+        MixinEnvironment.getDefaultEnvironment().addConfiguration("mekanismtweaks.mixins.json");
     }
 
     @Override

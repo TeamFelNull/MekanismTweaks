@@ -1,39 +1,44 @@
 package dev.felnull.mekanismtweaks.mixin;
 
-import dev.felnull.mekanismtweaks.Utils;
+import dev.felnull.mekanismtweaks.UpgradeEffect;
+import mekanism.common.Upgrade;
 import mekanism.common.base.IUpgradeTile;
 import mekanism.common.util.MekanismUtils;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = MekanismUtils.class, remap = false)
 public class MixinMekanismUtils {
 
-    /**
-     * @author nin8995
-     * @reason Extend speed effect exponentially. If performing more than one operation within a single tick, treat the excess operations as negative ticks required.
-     */
-    @Overwrite
-    public static int getTicks(IUpgradeTile tile, int def) {
-        double d = def * Utils.time(tile);
-        return Utils.clampToInt(d >= 1 ? d : -1 / d);
+    @Inject(method = "fractionUpgrades", at = @At("HEAD"), cancellable = true)
+    private static void fraction(IUpgradeTile mgmt, Upgrade type, CallbackInfoReturnable<Float> cir) {
+        cir.setReturnValue(UpgradeEffect.fraction(mgmt, type));
+        cir.cancel();
     }
 
-    /**
-     * @author nin8995
-     * @reason Extend energy saving effect exponentially, subject to the freeEnergy limitation.
-     */
-    @Overwrite
-    public static double getEnergyPerTick(IUpgradeTile tile, double def) {
-        return def * Utils.electricity(tile);
+    @Inject(method = "getTicks", at = @At("HEAD"), cancellable = true)
+    private static void speed(IUpgradeTile mgmt, int def, CallbackInfoReturnable<Integer> cir) {
+        cir.setReturnValue(UpgradeEffect.speed(mgmt, def));
+        cir.cancel();
     }
 
-    /**
-     * @author nin8995
-     * @reason Extend energy buffer effect exponentially.
-     */
-    @Overwrite
-    public static double getMaxEnergy(IUpgradeTile tile, double def) {
-        return def * Utils.capacity(tile);
+    @Inject(method = "getEnergyPerTick", at = @At("HEAD"), cancellable = true)
+    private static void energy(IUpgradeTile mgmt, double def, CallbackInfoReturnable<Double> cir) {
+        cir.setReturnValue(UpgradeEffect.energy(mgmt, def));
+        cir.cancel();
+    }
+
+    @Inject(method = "getMaxEnergy(Lmekanism/common/base/IUpgradeTile;D)D", at = @At("HEAD"), cancellable = true)
+    private static void energyBuffer(IUpgradeTile mgmt, double def, CallbackInfoReturnable<Double> cir) {
+        cir.setReturnValue(UpgradeEffect.energyBuffer(mgmt, def));
+        cir.cancel();
+    }
+
+    @Inject(method = "getSecondaryEnergyPerTickMean", at = @At("HEAD"), cancellable = true)
+    private static void gas(IUpgradeTile mgmt, int def, CallbackInfoReturnable<Double> cir) {
+        cir.setReturnValue(UpgradeEffect.gas(mgmt, def));
+        cir.cancel();
     }
 }

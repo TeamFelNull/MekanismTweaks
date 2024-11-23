@@ -1,0 +1,33 @@
+{
+  "required": true,
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.7.11",
+  "package": "dev.felnull.mekanismtweaks.mixin",
+  "refmap": "mekanismtweaks.refmap.json",
+  "mixins": [
+    "MixinChargeUtils",
+    "MixinElectricBlock",
+    "MixinHomoo",
+    "MixinItemUpgrade",
+    "MixinMekanismUtils",
+    "MixinStatUtils",
+    "MixinUpgrade",
+    "operate.AdvancedElectricMachine",
+    "operate.ChanceMachine",
+    "operate.ChemicalCrystallizer",
+    "operate.ChemicalDissolutionChamber",
+    "operate.ChemicalOxidizer",
+    "operate.DoubleElectricMachine",
+    "operate.ElectricMachine",
+    "operate.ElectricPump",
+    "operate.Factory",
+    "operate.FluidicPlenisher",
+    "operate.FormulaicAssemblicator",
+    "operate.MetallurgicInfuser",
+    "operate.OperationalMachine",
+    "operate.PRC"
+  ],
+  "client": [
+  ],
+  "server": []
+}

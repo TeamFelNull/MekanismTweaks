@@ -1,4 +1,4 @@
-package dev.felnull.mekanismtweaks.mixin;
+package dev.felnull.mekanismtweaks.mixin.operate;
 
 import dev.felnull.mekanismtweaks.Temp;
 import mekanism.common.tile.TileEntityFormulaicAssemblicator;
@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = TileEntityFormulaicAssemblicator.class, remap = false)
-public abstract class MixinFormulaicAssemblicator {
+public abstract class FormulaicAssemblicator {
 
     @Shadow
     public int ticksRequired;
