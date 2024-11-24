@@ -1,19 +1,16 @@
-package dev.felnull.mekanismtweaks.mixin.operate;
+package dev.felnull.mekanismtweaks.mixin.machine;
 
 import dev.felnull.mekanismtweaks.IOperationData;
 import dev.felnull.mekanismtweaks.Temp;
 import mekanism.common.tile.TileEntityChemicalDissolutionChamber;
-import mekanism.common.tile.TileEntityFactory;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(value = TileEntityChemicalDissolutionChamber.class, remap = false)
 public abstract class ChemicalDissolutionChamber implements IOperationData {
@@ -43,7 +40,7 @@ public abstract class ChemicalDissolutionChamber implements IOperationData {
 
     @Redirect(method = "onUpdate", at = @At(value = "FIELD", target = "Lmekanism/common/tile/TileEntityChemicalDissolutionChamber;injectUsage:D", opcode = Opcodes.GETFIELD))
     private double correctGasPerTick(TileEntityChemicalDissolutionChamber instance) {
-        return Temp.isInjecting.get() ? 0 : this.injectUsage;
+        return Temp.isInjecting.get() ? 0 : injectUsage;
     }
 
     @Shadow

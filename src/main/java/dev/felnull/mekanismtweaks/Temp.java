@@ -57,6 +57,11 @@ public class Temp {
     public static void inject2(IOperationData data, Runnable operation) {
         if (!isInjecting.get() && hasOperated.get()) {
             if (data.reqTime() < 0) {
+
+                // Excessive accumulation in machines that hold opeTime is NG.
+                if(data.opeTime() >= 20)
+                    data.setOpeTime(data.opeTime() % 20);
+
                 data.addOpeTime(-data.reqTime()); //add excess progress
                 isInjecting.set(true);
                 while (hasOperated.get() && data.opeTime() >= 20) {
@@ -77,7 +82,7 @@ public class Temp {
      * Avoid initializing excess progress.
      */
     public static void modifyOperatingTicksLater(IOperationData data, int value) {
-        // it dies trying to access cofh.redstoneflux.api.IEnergyReceiver, but (Object)
+        value = data.toOpeTime(value);
         if (!(value == 0 && data.reqTime() < 0)) data.setOpeTime(value);
     }
 

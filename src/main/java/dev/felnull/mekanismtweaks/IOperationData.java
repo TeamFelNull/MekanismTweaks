@@ -35,4 +35,11 @@ public interface IOperationData {
      */
     default void postProcessing() {
     }
+
+    /**
+     * If process and the variable that controls process are different. For her.
+     */
+    default int toOpeTime(int value){
+        return value;
+    }
 }

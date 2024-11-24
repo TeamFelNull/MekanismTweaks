@@ -32,6 +32,7 @@ public abstract class MixinUpgrade {
         cir.setReturnValue(upgrade == Upgrade.SPEED ? MekanismTweaks.maxSpeed :
                            upgrade == Upgrade.ENERGY ? MekanismTweaks.maxEnergy :
                            upgrade == Upgrade.GAS ? MekanismTweaks.maxGas :
+                           upgrade == Upgrade.MUFFLING ? MekanismTweaks.maxMuffling:
                            maxStack);
         cir.cancel();
     }

@@ -1,4 +1,4 @@
-package dev.felnull.mekanismtweaks.mixin.operate;
+package dev.felnull.mekanismtweaks.mixin.machine.operational;
 
 
 import dev.felnull.mekanismtweaks.IOperationData;
