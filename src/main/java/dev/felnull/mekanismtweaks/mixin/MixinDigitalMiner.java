@@ -3,6 +3,7 @@ package dev.felnull.mekanismtweaks.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.felnull.mekanismtweaks.Config;
+import dev.felnull.mekanismtweaks.UpgradeEffect;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
@@ -10,7 +11,7 @@ import mekanism.api.Upgrade;
 import mekanism.common.capabilities.energy.MinerEnergyContainer;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.tile.machine.TileEntityDigitalMiner;
-import mekanism.common.util.MekanismUtils;
+import mekanism.api.math.FloatingLong;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,16 +46,16 @@ public abstract class MixinDigitalMiner {
     @Inject(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityDigitalMiner;tryMineBlock()V", shift = At.Shift.AFTER))
     private void mekanismtweaks$mineMore(CallbackInfoReturnable<Boolean> cir) {
         TileEntityDigitalMiner miner = (TileEntityDigitalMiner) (Object) this;
-        int operations = Math.min(MekanismUtils.getOperationsPerTick(miner, MekanismConfig.general.minerTicksPerMine.get(), 1), Config.maxMinerOperations());
+        int operations = Math.min(UpgradeEffect.operationsPerTick(miner, MekanismConfig.general.minerTicksPerMine.get()), Config.maxMinerOperations());
         if (operations <= 1) {
             return;
         }
-        long energyPerTick = energyContainer.getEnergyPerTick();
+        FloatingLong energyPerTick = energyContainer.getEnergyPerTick();
         for (int i = 1; i < operations; i++) {
             if (hasOverflow || oresToMine.isEmpty()) {
                 break;
             }
-            if (energyContainer.extract(energyPerTick, Action.SIMULATE, AutomationType.INTERNAL) != energyPerTick) {
+            if (!energyContainer.extract(energyPerTick, Action.SIMULATE, AutomationType.INTERNAL).equals(energyPerTick)) {
                 break;
             }
             energyContainer.extract(energyPerTick, Action.EXECUTE, AutomationType.INTERNAL);

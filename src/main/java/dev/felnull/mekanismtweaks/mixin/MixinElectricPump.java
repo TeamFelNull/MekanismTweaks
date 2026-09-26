@@ -3,10 +3,11 @@ package dev.felnull.mekanismtweaks.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.felnull.mekanismtweaks.Config;
+import dev.felnull.mekanismtweaks.UpgradeEffect;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
+import mekanism.api.math.FloatingLong;
 import mekanism.common.tile.machine.TileEntityElectricPump;
-import mekanism.common.util.MekanismUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,14 +31,14 @@ public abstract class MixinElectricPump {
         if (!sucked) {
             return false;
         }
-        int operations = Math.min(MekanismUtils.getOperationsPerTick(pump, BASE_TICKS_REQUIRED, 1), Config.maxPumpOperations());
-        long energyPerTick = pump.getEnergyContainer().getEnergyPerTick();
+        int operations = Math.min(UpgradeEffect.operationsPerTick(pump, BASE_TICKS_REQUIRED), Config.maxPumpOperations());
+        FloatingLong energyPerTick = pump.getEnergyContainer().getEnergyPerTick();
         for (int i = 1; i < operations; i++) {
             // the tank must have room for another operation, and there must be energy for it
             if (!pump.fluidTank.isEmpty() && pump.estimateIncrementAmount() > pump.fluidTank.getNeeded()) {
                 break;
             }
-            if (pump.getEnergyContainer().extract(energyPerTick, Action.SIMULATE, AutomationType.INTERNAL) != energyPerTick) {
+            if (!pump.getEnergyContainer().extract(energyPerTick, Action.SIMULATE, AutomationType.INTERNAL).equals(energyPerTick)) {
                 break;
             }
             pump.getEnergyContainer().extract(energyPerTick, Action.EXECUTE, AutomationType.INTERNAL);

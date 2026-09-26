@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[4,)"
+loaderVersion = "[2,)"
 license = "Unlicense"
 
 [[mods]]
@@ -19,20 +19,20 @@ config = "mekanismtweaks.mixins.json"
 [[dependencies.mekanismtweaks]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.1,)"
+versionRange = "[20.4,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.mekanismtweaks]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.1]"
+versionRange = "[1.20.4]"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.mekanismtweaks]]
 modId = "mekanism"
 type = "required"
-versionRange = "[10.7,10.8)"
+versionRange = "[10.5,10.6)"
 ordering = "AFTER"
 side = "BOTH"

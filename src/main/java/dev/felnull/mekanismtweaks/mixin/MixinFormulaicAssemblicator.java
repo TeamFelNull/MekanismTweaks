@@ -3,10 +3,11 @@ package dev.felnull.mekanismtweaks.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.felnull.mekanismtweaks.Config;
+import dev.felnull.mekanismtweaks.UpgradeEffect;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
+import mekanism.api.math.FloatingLong;
 import mekanism.common.tile.machine.TileEntityFormulaicAssemblicator;
-import mekanism.common.util.MekanismUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,10 +31,10 @@ public abstract class MixinFormulaicAssemblicator {
         if (!crafted) {
             return false;
         }
-        int operations = Math.min(MekanismUtils.getOperationsPerTick(assemblicator, BASE_TICKS_REQUIRED, 1), Config.maxAssemblicatorOperations());
-        long energyPerTick = assemblicator.getEnergyContainer().getEnergyPerTick();
+        int operations = Math.min(UpgradeEffect.operationsPerTick(assemblicator, BASE_TICKS_REQUIRED), Config.maxAssemblicatorOperations());
+        FloatingLong energyPerTick = assemblicator.getEnergyContainer().getEnergyPerTick();
         for (int i = 1; i < operations; i++) {
-            if (assemblicator.getEnergyContainer().extract(energyPerTick, Action.SIMULATE, AutomationType.INTERNAL) != energyPerTick) {
+            if (!assemblicator.getEnergyContainer().extract(energyPerTick, Action.SIMULATE, AutomationType.INTERNAL).equals(energyPerTick)) {
                 break;
             }
             assemblicator.getEnergyContainer().extract(energyPerTick, Action.EXECUTE, AutomationType.INTERNAL);

@@ -1,6 +1,6 @@
 package dev.felnull.mekanismtweaks;
 
-import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 
@@ -9,7 +9,7 @@ public class MekanismTweaks {
 
     public static final String MODID = "mekanismtweaks";
 
-    public MekanismTweaks(ModContainer container) {
-        container.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+    public MekanismTweaks() {
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 }

@@ -18,7 +18,7 @@ public abstract class MixinUpgrade {
         switch ((Upgrade) (Object) this) {
             case SPEED -> cir.setReturnValue(Config.maxSpeed());
             case ENERGY -> cir.setReturnValue(Config.maxEnergy());
-            case CHEMICAL -> cir.setReturnValue(Config.maxChemical());
+            case GAS -> cir.setReturnValue(Config.maxGas());
             default -> {
             }
         }

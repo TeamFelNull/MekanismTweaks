@@ -13,8 +13,8 @@ public class UpgradeEffect {
 
     /**
      * The UpgradesInstalled fraction that Mekanism's formulas turn into effects (energy per tick, ticks required, energy capacity, ...).
-     * Eight upgrades are one unit of effect for Speed, Energy and Chemical Upgrades, as per vanilla mekanism, however many of them can be installed.
-     * The effect of Energy and Chemical Upgrades beyond the Speed Upgrades decays.
+     * Eight upgrades are one unit of effect for Speed, Energy and Gas Upgrades, as per vanilla mekanism, however many of them can be installed.
+     * The effect of Energy and Gas Upgrades beyond the Speed Upgrades decays.
      */
     public static double fraction(IUpgradeTile tile, Upgrade type) {
         if (!tile.supportsUpgrade(type)) {
@@ -25,7 +25,7 @@ public class UpgradeEffect {
         return switch (type) {
             case SPEED -> count / 8D;
             case ENERGY -> decayed(speed, count, Config.freeEnergy(), Config.sustEnergy());
-            case CHEMICAL -> decayed(speed, count, Config.freeChemical(), Config.sustChemical());
+            case GAS -> decayed(speed, count, Config.freeGas(), Config.sustGas());
             default -> count / (double) type.getMax();
         };
     }
@@ -68,6 +68,21 @@ public class UpgradeEffect {
     public static boolean needsEnergyUpgrades(IUpgradeTile tile) {
         return tile.supportsUpgrade(Upgrade.ENERGY)
                 && tile.getComponent().getUpgrades(Upgrade.SPEED) - tile.getComponent().getUpgrades(Upgrade.ENERGY) > WARN_DIFFERENCE;
+    }
+
+    /**
+     * The time per operation in ticks, as a fraction: below one means that the machine could do several operations per tick.
+     */
+    public static double ticks(IUpgradeTile tile, int baseTicks) {
+        return baseTicks * effect(-fraction(tile, Upgrade.SPEED));
+    }
+
+    /**
+     * How many operations a machine could do in one tick. Fractional operations are ignored.
+     */
+    public static int operationsPerTick(IUpgradeTile tile, int baseTicks) {
+        double ticks = ticks(tile, baseTicks);
+        return ticks >= 1 ? 1 : (int) Math.min(Integer.MAX_VALUE, 1 / ticks);
     }
 
     /**
