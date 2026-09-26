@@ -7,6 +7,7 @@ import mekanism.api.Upgrade;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.tile.interfaces.IUpgradeTile;
+import mekanism.common.tile.factory.TileEntityFactory;
 import mekanism.common.tile.prefab.TileEntityProgressMachine;
 import mekanism.common.util.ItemDataUtils;
 import mekanism.common.util.MekanismUtils;
@@ -45,7 +46,7 @@ public class MixinMekanismUtils {
         double ticks = UpgradeEffect.ticks(tile, def);
         if (ticks >= 1) {
             cir.setReturnValue((int) Math.min(Integer.MAX_VALUE, ticks));
-        } else if (tile instanceof TileEntityProgressMachine<?>) {
+        } else if (tile instanceof TileEntityProgressMachine<?> || tile instanceof TileEntityFactory<?>) {
             int operations = (int) Math.min(Config.maxMachineOperations(), Math.min(Integer.MAX_VALUE, 1 / ticks));
             cir.setReturnValue(1 - operations);
         } else {
