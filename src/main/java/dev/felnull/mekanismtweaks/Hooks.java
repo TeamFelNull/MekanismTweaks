@@ -15,6 +15,7 @@ import mekanism.common.tile.TileEntityContainerBlock;
 import mekanism.common.tile.TileEntityDigitalMiner;
 import mekanism.common.tile.TileEntityElectricBlock;
 import mekanism.common.tile.TileEntityElectricPump;
+import mekanism.common.tile.TileEntityFactory;
 import mekanism.common.tile.TileEntityFluidicPlenisher;
 import mekanism.common.tile.TileEntityFormulaicAssemblicator;
 import mekanism.common.tile.TileEntityMetallurgicInfuser;
@@ -254,6 +255,20 @@ public class Hooks {
     }
 
     /**
+     * The same for the gas per tick of a Factory, which is an integer.
+     */
+    public static int guardInt(int value) {
+        return isInjecting.get() ? 0 : value;
+    }
+
+    /**
+     * The progress bar of a Factory: ticks required are zero or negative while it operates more than once per tick.
+     */
+    public static int factoryProgress(TileEntityFactory factory, int scale, int process) {
+        return factory.ticksRequired <= 1 ? (factory.isActive ? scale : 0) : factory.progress[process] * scale / factory.ticksRequired;
+    }
+
+    /**
      * Perform excess operations after a machine has operated in its update.
      */
     public static void afterUpdate(Object machine) {
@@ -347,6 +362,7 @@ public class Hooks {
     }
 
     private static int ticksRequired(Object machine) {
+        if (machine instanceof TileEntityFactory) return ((TileEntityFactory) machine).ticksRequired;
         if (machine instanceof TileEntityElectricPump) return ((TileEntityElectricPump) machine).ticksRequired;
         if (machine instanceof TileEntityFluidicPlenisher) return ((TileEntityFluidicPlenisher) machine).ticksRequired;
         if (machine instanceof TileEntityFormulaicAssemblicator) return ((TileEntityFormulaicAssemblicator) machine).ticksRequired;

@@ -29,6 +29,7 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
     private static final String CLIENT_HOOKS = "dev/felnull/mekanismtweaks/ClientHooks";
     private static final String RERUN = "dev/felnull/mekanismtweaks/IRerun";
     private static final String MINER = "mekanism/common/tile/TileEntityDigitalMiner";
+    private static final String FACTORY = "mekanism/common/tile/TileEntityFactory";
 
     private static final String UTILS = "mekanism/common/util/MekanismUtils";
     private static final String UPGRADE = "mekanism/common/Upgrade";
@@ -55,7 +56,8 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
             "mekanism.common.tile.TileEntityDigitalMiner",
             "mekanism.common.tile.TileEntityElectricPump",
             "mekanism.common.tile.TileEntityFluidicPlenisher",
-            "mekanism.common.tile.TileEntityFormulaicAssemblicator"));
+            "mekanism.common.tile.TileEntityFormulaicAssemblicator",
+            "mekanism.common.tile.TileEntityFactory"));
 
     /**
      * The classes that have their own recalculateUpgradables.
@@ -69,7 +71,8 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
             "mekanism.common.tile.TileEntityChemicalDissolutionChamber",
             "mekanism.common.tile.TileEntityElectricPump",
             "mekanism.common.tile.TileEntityFluidicPlenisher",
-            "mekanism.common.tile.TileEntityFormulaicAssemblicator"));
+            "mekanism.common.tile.TileEntityFormulaicAssemblicator",
+            "mekanism.common.tile.TileEntityFactory"));
 
     /**
      * The classes that have their own getScaledProgress.
@@ -263,7 +266,8 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
             boolean concrete = (method.access & (ACC_ABSTRACT | ACC_NATIVE | ACC_BRIDGE | ACC_SYNTHETIC)) == 0;
             if (!concrete) continue;
 
-            if (method.name.equals("operate") && method.desc.startsWith("(Lmekanism/common/recipe/machines/")) {
+            if (method.name.equals("operate") && (method.desc.startsWith("(Lmekanism/common/recipe/machines/")
+                    || (node.name.equals(FACTORY) && method.desc.equals("(II)V")))) {
                 method.instructions.insert(new MethodInsnNode(INVOKESTATIC, HOOKS, "operated", "()V", false));
             } else if (method.name.equals("onUpdate") && method.desc.equals("()V")) {
                 updates++;
@@ -272,6 +276,9 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
                         FieldInsnNode field = (FieldInsnNode) insn;
                         if (field.desc.equals("D") && GUARDED_FIELDS.contains(field.name)) {
                             method.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, HOOKS, "guard", "(D)D", false));
+                        } else if (field.desc.equals("I") && field.name.equals("secondaryEnergyThisTick")) {
+                            // the gas of one tick of a Factory
+                            method.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, HOOKS, "guardInt", "(I)I", false));
                         }
                     } else if (insn instanceof MethodInsnNode && ((MethodInsnNode) insn).name.equals("getDelay") && ((MethodInsnNode) insn).desc.equals("()I")) {
                         // the Digital Miner (it has no operate method): the delay is only set after it has mined a block
@@ -310,6 +317,15 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
                     list.add(new MethodInsnNode(INVOKESTATIC, HOOKS, "enterMiner", "(Ljava/lang/Object;)V", false));
                     method.instructions.insert(list);
                 }
+            } else if (node.name.equals(FACTORY) && method.name.equals("getScaledProgress") && method.desc.equals("(II)I")) {
+                // the progress bar of a Factory: ticks required are non-positive while it operates more than once per tick
+                InsnList list = new InsnList();
+                list.add(new VarInsnNode(ALOAD, 0));
+                list.add(new VarInsnNode(ILOAD, 1));
+                list.add(new VarInsnNode(ILOAD, 2));
+                list.add(new MethodInsnNode(INVOKESTATIC, HOOKS, "factoryProgress", "(Lmekanism/common/tile/TileEntityFactory;II)I", false));
+                list.add(new InsnNode(IRETURN));
+                replaceBody(method, list);
             } else if (node.name.equals(MINER) && method.name.equals("<init>")) {
                 // the Digital Miner supports Muffling Upgrades
                 for (AbstractInsnNode insn : method.instructions.toArray()) {
