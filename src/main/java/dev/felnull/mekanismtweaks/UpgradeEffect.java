@@ -22,12 +22,14 @@ public class UpgradeEffect {
         }
         int count = tile.getComponent().getUpgrades(type);
         int speed = tile.getComponent().getUpgrades(Upgrade.SPEED);
-        return switch (type) {
-            case SPEED -> count / 8D;
-            case ENERGY -> decayed(speed, count, Config.freeEnergy(), Config.sustEnergy());
-            case GAS -> decayed(speed, count, Config.freeGas(), Config.sustGas());
-            default -> count / (double) type.getMax();
-        };
+        if (type == Upgrade.SPEED) {
+            return count / 8D;
+        } else if (type == Upgrade.ENERGY) {
+            return decayed(speed, count, Config.freeEnergy(), Config.sustEnergy());
+        } else if (type == Upgrade.GAS) {
+            return decayed(speed, count, Config.freeGas(), Config.sustGas());
+        }
+        return count / (double) type.getMax();
     }
 
     /**

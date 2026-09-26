@@ -4,14 +4,14 @@ import dev.felnull.mekanismtweaks.Config;
 import dev.felnull.mekanismtweaks.UpgradeEffect;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import mekanism.api.Action;
-import mekanism.api.AutomationType;
+import mekanism.api.inventory.AutomationType;
 import mekanism.api.Upgrade;
 import mekanism.common.capabilities.energy.MinerEnergyContainer;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.tile.machine.TileEntityDigitalMiner;
 import mekanism.api.math.FloatingLong;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -62,11 +62,11 @@ public abstract class MixinDigitalMiner {
     /**
      * The block break effect of the Digital Miner makes no sound when it is fully muffled.
      */
-    @Redirect(method = "tryMineBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;levelEvent(ILnet/minecraft/core/BlockPos;I)V", remap = true))
-    private void mekanismtweaks$muffleBreakEffect(Level level, int type, BlockPos pos, int data) {
+    @Redirect(method = "tryMineBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playEvent(ILnet/minecraft/util/math/BlockPos;I)V", remap = true))
+    private void mekanismtweaks$muffleBreakEffect(World level, int type, BlockPos pos, int data) {
         TileEntityDigitalMiner miner = (TileEntityDigitalMiner) (Object) this;
         if (miner.getComponent().getUpgrades(Upgrade.MUFFLING) < Upgrade.MUFFLING.getMax()) {
-            level.levelEvent(type, pos, data);
+            level.playEvent(type, pos, data);
         }
     }
 }

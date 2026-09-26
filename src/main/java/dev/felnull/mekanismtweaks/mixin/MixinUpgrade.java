@@ -15,12 +15,13 @@ public abstract class MixinUpgrade {
      */
     @Inject(method = "getMax", at = @At("HEAD"), cancellable = true)
     private void mekanismtweaks$getMax(CallbackInfoReturnable<Integer> cir) {
-        switch ((Upgrade) (Object) this) {
-            case SPEED -> cir.setReturnValue(Config.maxSpeed());
-            case ENERGY -> cir.setReturnValue(Config.maxEnergy());
-            case GAS -> cir.setReturnValue(Config.maxGas());
-            default -> {
-            }
+        Upgrade upgrade = (Upgrade) (Object) this;
+        if (upgrade == Upgrade.SPEED) {
+            cir.setReturnValue(Config.maxSpeed());
+        } else if (upgrade == Upgrade.ENERGY) {
+            cir.setReturnValue(Config.maxEnergy());
+        } else if (upgrade == Upgrade.GAS) {
+            cir.setReturnValue(Config.maxGas());
         }
     }
 }

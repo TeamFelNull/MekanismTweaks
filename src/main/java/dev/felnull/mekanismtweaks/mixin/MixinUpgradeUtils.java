@@ -6,7 +6,7 @@ import mekanism.common.MekanismLang;
 import mekanism.common.tile.interfaces.IUpgradeTile;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.UpgradeUtils;
-import net.minecraft.network.chat.Component;
+import net.minecraft.util.text.ITextComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,8 +22,8 @@ public class MixinUpgradeUtils {
      * Display the effect that is really applied, exponentially. As to Energy and Chemical Upgrades, the decayed effect.
      */
     @Inject(method = "getMultScaledInfo", at = @At("HEAD"), cancellable = true)
-    private static void mekanismtweaks$multScaledInfo(IUpgradeTile tile, Upgrade upgrade, CallbackInfoReturnable<List<Component>> cir) {
-        List<Component> ret = new ArrayList<>();
+    private static void mekanismtweaks$multScaledInfo(IUpgradeTile tile, Upgrade upgrade, CallbackInfoReturnable<List<ITextComponent>> cir) {
+        List<ITextComponent> ret = new ArrayList<>();
         if (tile.supportsUpgrades() && upgrade.getMax() > 1) {
             double effect = UpgradeEffect.effect(MekanismUtils.fractionUpgrades(tile, upgrade));
             ret.add(MekanismLang.UPGRADES_EFFECT.translate(UpgradeEffect.exponential(effect)));

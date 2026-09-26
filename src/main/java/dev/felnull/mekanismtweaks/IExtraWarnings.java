@@ -1,6 +1,6 @@
 package dev.felnull.mekanismtweaks;
 
-import net.minecraft.network.chat.Component;
+import net.minecraft.util.text.ITextComponent;
 
 import java.util.function.BooleanSupplier;
 
@@ -10,5 +10,5 @@ import java.util.function.BooleanSupplier;
  */
 public interface IExtraWarnings {
 
-    void mekanismtweaks$addExtra(BooleanSupplier check, Component message);
+    void mekanismtweaks$addExtra(BooleanSupplier check, ITextComponent message);
 }

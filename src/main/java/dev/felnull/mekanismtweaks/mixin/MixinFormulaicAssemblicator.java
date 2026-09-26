@@ -3,7 +3,7 @@ package dev.felnull.mekanismtweaks.mixin;
 import dev.felnull.mekanismtweaks.Config;
 import dev.felnull.mekanismtweaks.UpgradeEffect;
 import mekanism.api.Action;
-import mekanism.api.AutomationType;
+import mekanism.api.inventory.AutomationType;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.tile.machine.TileEntityFormulaicAssemblicator;
 import org.spongepowered.asm.mixin.Final;

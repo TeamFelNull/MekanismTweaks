@@ -1,8 +1,8 @@
 package dev.felnull.mekanismtweaks.mixin;
 
 import dev.felnull.mekanismtweaks.IExtraWarnings;
-import mekanism.common.inventory.warning.WarningTracker;
-import net.minecraft.network.chat.Component;
+import mekanism.client.gui.warning.WarningTracker;
+import net.minecraft.util.text.ITextComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,10 +20,10 @@ public abstract class MixinWarningTracker implements IExtraWarnings {
     @Unique
     private final List<BooleanSupplier> mekanismtweaks$checks = new ArrayList<>();
     @Unique
-    private final List<Component> mekanismtweaks$messages = new ArrayList<>();
+    private final List<ITextComponent> mekanismtweaks$messages = new ArrayList<>();
 
     @Override
-    public void mekanismtweaks$addExtra(BooleanSupplier check, Component message) {
+    public void mekanismtweaks$addExtra(BooleanSupplier check, ITextComponent message) {
         mekanismtweaks$checks.add(check);
         mekanismtweaks$messages.add(message);
     }
@@ -51,7 +51,7 @@ public abstract class MixinWarningTracker implements IExtraWarnings {
      * The warnings that are listed in the tooltip of the warning tab.
      */
     @Inject(method = "getWarnings", at = @At("RETURN"))
-    private void mekanismtweaks$getWarnings(CallbackInfoReturnable<List<Component>> cir) {
+    private void mekanismtweaks$getWarnings(CallbackInfoReturnable<List<ITextComponent>> cir) {
         for (int i = 0; i < mekanismtweaks$checks.size(); i++) {
             if (mekanismtweaks$checks.get(i).getAsBoolean()) {
                 cir.getReturnValue().add(mekanismtweaks$messages.get(i));
