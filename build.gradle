@@ -52,3 +52,10 @@ dependencies {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
+
+// neoforge.mods.toml takes the mod version from the jar (${file.jarVersion}), which reads this manifest entry
+tasks.named('jar') {
+    manifest {
+        attributes('Implementation-Version': project.version)
+    }
+}
