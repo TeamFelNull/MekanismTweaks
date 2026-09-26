@@ -43,6 +43,13 @@ public class Temp {
      * @param reqTime ticks required per operation, negative if excess operations are due
      */
     public static void afterUpdate(TileEntity tile, int reqTime, Runnable update) {
+        afterUpdate(tile, reqTime, update, Integer.MAX_VALUE);
+    }
+
+    /**
+     * @param maxExtra the most excess operations performed in one tick
+     */
+    public static void afterUpdate(TileEntity tile, int reqTime, Runnable update, int maxExtra) {
         if (tile.getWorldObj() == null || tile.getWorldObj().isRemote || isInjecting.get()) return;
 
         if (!hasOperated.get()) {
@@ -60,7 +67,7 @@ public class Temp {
         int acc = (stored == null ? 0 : stored) - reqTime;
         isInjecting.set(true);
         try {
-            while (acc >= 20) {
+            for (int extra = 0; acc >= 20 && extra < maxExtra; extra++) {
                 acc -= 20;
                 update.run();
                 if (!hasOperated.get()) {
@@ -69,6 +76,8 @@ public class Temp {
                 }
                 hasOperated.set(false);
             }
+            // if the cap stopped the loop, do not save up the rest
+            acc = Math.min(acc, 19);
         } finally {
             isInjecting.set(false);
             hasOperated.set(false);

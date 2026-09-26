@@ -17,6 +17,7 @@
     "machine.MixinChemicalCrystallizer",
     "machine.MixinChemicalDissolutionChamber",
     "machine.MixinChemicalOxidizer",
+    "machine.MixinDigitalMiner",
     "machine.MixinElectricMachine",
     "machine.MixinMetallurgicInfuser",
     "machine.MixinPRC"
