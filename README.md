@@ -22,7 +22,7 @@ Mekanism's upgrades are capped at 8 (Speed, Energy, Gas). This mod lifts that ca
 - **Energy costs scale with speed.** The energy per tick grows with the Speed Upgrades. Energy Upgrades save energy and enlarge the energy buffer, but the effect of Energy Upgrades beyond the Speed Upgrades decays (see `freeEnergy` and `sustEnergy`). Gas Upgrades work the same way for the gas consumption (`freeGas`, `sustGas`).
 - **Warning icon.** When a machine has more than 10 more Speed Upgrades than Energy Upgrades, a blinking yellow warning icon appears under the redstone control tab of its GUI. Hover it: *Insert Energy Upgrades!* Without enough Energy Upgrades the energy needed per tick can exceed what the machine can store, and it stops working.
 
-Supported machines: electric machines (Enrichment Chamber, Crusher, ...), advanced electric machines (Purification Chamber, Chemical Injection Chamber, ...), chance machines, Pressurized Reaction Chamber, Metallurgic Infuser, Chemical Oxidizer, Chemical Dissolution Chamber, Chemical Crystallizer, Digital Miner, Electric Pump, Fluidic Plenisher and Formulaic Assemblicator. Other machines get the upgrade limits and the effect scaling, but never take less than one tick per operation.
+Supported machines: electric machines (Enrichment Chamber, Crusher, ...), advanced electric machines (Purification Chamber, Chemical Injection Chamber, ...), chance machines, Pressurized Reaction Chamber, Metallurgic Infuser, Chemical Oxidizer, Chemical Dissolution Chamber, Chemical Crystallizer, Factories (all tiers), Factories (all tiers), Digital Miner, Electric Pump, Fluidic Plenisher and Formulaic Assemblicator. Other machines get the upgrade limits and the effect scaling, but never take less than one tick per operation.
 
 ## Config
 
