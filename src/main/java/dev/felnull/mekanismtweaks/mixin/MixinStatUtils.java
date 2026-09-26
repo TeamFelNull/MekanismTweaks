@@ -27,9 +27,7 @@ public class MixinStatUtils {
             for (; p < d && k < 3 * m; k++)
                 p += Math.pow(m / (m + k), m + k) * Math.exp(k) / Math.sqrt(2 * Math.PI * (m + k));
 
-            int n = (int) m + k;
-            cir.setReturnValue(n);
-            cir.cancel();
+            cir.setReturnValue((int) m + k);
         }
     }
 }

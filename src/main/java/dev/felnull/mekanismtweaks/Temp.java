@@ -1,6 +1,12 @@
 package dev.felnull.mekanismtweaks;
 
-import mekanism.common.tile.prefab.TileEntityMachine;
+import mekanism.common.IUpgradeManagement;
+import mekanism.common.util.MekanismUtils;
+import net.minecraft.tileentity.TileEntity;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Static class members for Mixin classes (for they don't allow them)
@@ -8,88 +14,74 @@ import mekanism.common.tile.prefab.TileEntityMachine;
 public class Temp {
 
     /**
-     * Avoid injecting inside an injection.
+     * Avoid injecting inside an injection. While injecting, energy and gas are not consumed again.
      */
-    public static final ThreadLocal<Boolean> isInjecting = ThreadLocal.withInitial(() -> false);
+    public static final ThreadLocal<Boolean> isInjecting = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false;
+        }
+    };
     /**
      * Avoid performing the operation when it cannot operate.
      */
-    public static final ThreadLocal<Boolean> hasOperated = ThreadLocal.withInitial(() -> false);
-
-    /**
-     * Perform excess operations.
-     */
-    public static void inject(int reqTime, Runnable operation) {
-        if (!isInjecting.get()) {
-            isInjecting.set(true);
-            for (int i = reqTime; i < 0; i++) {
-                operation.run();
-                if (!hasOperated.get())
-                    break;
-                else
-                    hasOperated.set(false);
-            }
-            isInjecting.set(false);
-        } else {
-            hasOperated.set(true);
+    public static final ThreadLocal<Boolean> hasOperated = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false;
         }
-    }
+    };
 
     /**
-     * For Homoo. For she has no apparent operation method.
+     * Excess progress of each machine. Twenty progress is one operation.
      */
-    public static void injectHomoo(int reqTime, Runnable operation) {
-        if (!isInjecting.get()) {
-            isInjecting.set(true);
-            for (int i = reqTime; i < 0; i++) {
-                if (hasOperated.get()) {
-                    hasOperated.set(false);
-                    operation.run();
-                } else {
+    private static final Map<TileEntity, Integer> progress = Collections.synchronizedMap(new WeakHashMap<TileEntity, Integer>());
+
+    /**
+     * Perform excess operations after a machine has operated in its update.
+     *
+     * @param reqTime ticks required per operation, negative if excess operations are due
+     */
+    public static void afterUpdate(TileEntity tile, int reqTime, Runnable update) {
+        if (tile.getWorldObj() == null || tile.getWorldObj().isRemote || isInjecting.get()) return;
+
+        if (!hasOperated.get()) {
+            progress.remove(tile);
+            return;
+        }
+        hasOperated.set(false);
+
+        if (reqTime >= 0) {
+            progress.remove(tile);
+            return;
+        }
+
+        Integer stored = progress.get(tile);
+        int acc = (stored == null ? 0 : stored) - reqTime;
+        isInjecting.set(true);
+        try {
+            while (acc >= 20) {
+                acc -= 20;
+                update.run();
+                if (!hasOperated.get()) {
+                    acc = 0;
                     break;
                 }
+                hasOperated.set(false);
             }
-            hasOperated.set(false);
+        } finally {
             isInjecting.set(false);
-        }
-    }
-
-    public static void inject2(IOperationData data, Runnable operation) {
-        if (!isInjecting.get() && hasOperated.get()) {
-            if (data.reqTime() < 0) {
-
-                // Excessive accumulation in machines that hold opeTime is NG.
-                if(data.opeTime() >= 20)
-                    data.setOpeTime(data.opeTime() % 20);
-
-                data.addOpeTime(-data.reqTime()); //add excess progress
-                isInjecting.set(true);
-                while (hasOperated.get() && data.opeTime() >= 20) {
-                    hasOperated.set(false);
-                    data.subOpeTime(20); // consume 20 progress per operation
-                    operation.run();
-                }
-                data.postProcessing();
-                isInjecting.set(false);
-            } else if (data.opeTime() > 0) {
-                data.setOpeTime(0);
-            }
             hasOperated.set(false);
         }
+        progress.put(tile, acc);
     }
 
     /**
-     * Avoid initializing excess progress.
+     * The GUI progress of machines that finish at least one operation per tick.
+     *
+     * @return null if the default calculation is fine
      */
-    public static void modifyOperatingTicksLater(IOperationData data, int value) {
-        value = data.toOpeTime(value);
-        if (!(value == 0 && data.reqTime() < 0)) data.setOpeTime(value);
-    }
-
-    /**
-     * Avoid consuming energy while performing excess operations.
-     */
-    public static double correctEnergyPerTick(TileEntityMachine instance) {
-        return isInjecting.get() ? 0 : instance.energyPerTick;
+    public static Double scaledProgress(IUpgradeManagement machine, int ticksRequired, boolean active) {
+        return MekanismUtils.getTicks(machine, ticksRequired) <= 1 ? (Double) (active ? 1D : 0D) : null;
     }
 }

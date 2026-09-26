@@ -20,3 +20,6 @@ build
 # other
 eclipse
 run
+
+# Mekanism jar for compiling (download it, see README)
+libs/Mekanism-*.jar
