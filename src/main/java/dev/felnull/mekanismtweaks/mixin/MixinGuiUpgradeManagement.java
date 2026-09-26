@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinGuiUpgradeManagement extends GuiElement {
 
     /**
-     * Speed upgrades beyond this many more than energy upgrades make the machine consume more energy than it can store.
+     * Speed upgrades more than this many more than energy upgrades make the machine consume more energy than it can store.
      */
     private static final int WARN_DIFFERENCE = 10;
 
@@ -42,7 +42,7 @@ public abstract class MixinGuiUpgradeManagement extends GuiElement {
     @Inject(method = "renderForeground", at = @At("TAIL"))
     private void warnShortOfEnergy(int xAxis, int yAxis, CallbackInfo ci) {
         IUpgradeTile tile = (IUpgradeTile) tileEntity;
-        if (tile.getSpeedMultiplier() - tile.getEnergyMultiplier() < WARN_DIFFERENCE) return;
+        if (tile.getSpeedMultiplier() - tile.getEnergyMultiplier() <= WARN_DIFFERENCE) return;
 
         // frame
         Gui.drawRect(ICON_X, ICON_Y, ICON_X + ICON_SIZE, ICON_Y + ICON_SIZE, 0xFF373737);
