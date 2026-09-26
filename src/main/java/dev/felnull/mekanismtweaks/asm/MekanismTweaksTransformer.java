@@ -50,7 +50,8 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
             "mekanism.common.tile.TileEntityMetallurgicInfuser",
             "mekanism.common.tile.TileEntityChemicalCrystallizer",
             "mekanism.common.tile.TileEntityChemicalOxidizer",
-            "mekanism.common.tile.TileEntityChemicalDissolutionChamber"));
+            "mekanism.common.tile.TileEntityChemicalDissolutionChamber",
+            "mekanism.common.tile.TileEntityDigitalMiner"));
 
     /**
      * The classes that have their own recalculateUpgradables.
@@ -263,6 +264,9 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
                         if (field.desc.equals("D") && GUARDED_FIELDS.contains(field.name)) {
                             method.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, HOOKS, "guard", "(D)D", false));
                         }
+                    } else if (insn instanceof MethodInsnNode && ((MethodInsnNode) insn).name.equals("getDelay") && ((MethodInsnNode) insn).desc.equals("()I")) {
+                        // the Digital Miner (it has no operate method): the delay is only set after it has mined a block
+                        method.instructions.insertBefore(insn, new MethodInsnNode(INVOKESTATIC, HOOKS, "operated", "()V", false));
                     } else if (insn.getOpcode() == RETURN) {
                         InsnList list = new InsnList();
                         list.add(new VarInsnNode(ALOAD, 0));

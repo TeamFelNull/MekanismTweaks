@@ -16,10 +16,11 @@ Mekanism's upgrades are capped at 8 (Speed, Energy, Gas). This mod lifts that ca
 - **Configurable upgrade limits.** The maximum number of Speed, Energy, Gas and Muffling Upgrades a machine can hold is set in the config (64, 64, 64 and 4 by default). The upgrade items' stack size follows it (never above 64).
 - **Bulk install.** The whole stack in the upgrade slot is installed at once, up to the limit, instead of one upgrade every 40 ticks.
 - **Beyond one operation per tick.** When the required time drops below one tick, the excess progress turns into extra operations in the same tick (one extra operation per 20 excess progress). The progress bar shows full while a machine runs this fast.
+- **Digital Miner.** Mekanism's Digital Miner mines one block per tick at the most, however many Speed Upgrades it has. When the time per block drops below one tick, it now mines several blocks in the same tick, up to `maxMinerOperations`. Every extra block costs the energy of one tick.
 - **Energy costs scale with speed.** The energy per tick grows with the Speed Upgrades. Energy Upgrades save energy and enlarge the energy buffer, but the effect of Energy Upgrades beyond the Speed Upgrades decays (see `freeEnergy` and `sustEnergy`). Gas Upgrades work the same way for the gas consumption (`freeGas`, `sustGas`).
 - **Warning icon.** When a machine has more than 10 more Speed Upgrades than Energy Upgrades, a blinking yellow warning icon appears under the redstone control tab of its GUI. Hover it: *Insert Energy Upgrades!* Without enough Energy Upgrades the energy needed per tick can exceed what the machine can store, and it stops working.
 
-Supported machines: electric machines (Enrichment Chamber, Crusher, ...), advanced electric machines (Purification Chamber, Chemical Injection Chamber, ...), chance machines, Pressurized Reaction Chamber, Metallurgic Infuser, Chemical Oxidizer, Chemical Dissolution Chamber and Chemical Crystallizer. Other machines get the upgrade limits and the effect scaling, but never take less than one tick per operation.
+Supported machines: electric machines (Enrichment Chamber, Crusher, ...), advanced electric machines (Purification Chamber, Chemical Injection Chamber, ...), chance machines, Pressurized Reaction Chamber, Metallurgic Infuser, Chemical Oxidizer, Chemical Dissolution Chamber, Chemical Crystallizer and Digital Miner. Other machines get the upgrade limits and the effect scaling, but never take less than one tick per operation.
 
 ## Config
 
@@ -32,6 +33,7 @@ Supported machines: electric machines (Enrichment Chamber, Crusher, ...), advanc
 | `maxGas` | 64 | Maximum Gas Upgrades installed. `2147483647` means unlimited. |
 | `maxMuffling` | 4 | Maximum Muffling Upgrades installed. |
 | `bulkInstall` | true | Install the whole stack in the upgrade slot at once. |
+| `maxMinerOperations` | 64 | The most blocks a Digital Miner mines in one tick. `1` turns this off, as per vanilla Mekanism. |
 | `energyBuffer` | true | Avoid an excessive energy buffer: the buffer increment of surplus Energy Upgrades decays like their saving effect. |
 | `freeEnergy` / `freeGas` | 8 | Minimum number of Energy / Gas Upgrades whose effect never decays. |
 | `sustEnergy` / `sustGas` | 0.5 | How much of the Energy / Gas Upgrades' effect is sustained against the Speed Upgrades. At 1 nothing decays (as in vanilla Mekanism); at 0 the effect decays fully. At 0.5, overcoming the Speed Upgrades needs upgrades of at least their square. |

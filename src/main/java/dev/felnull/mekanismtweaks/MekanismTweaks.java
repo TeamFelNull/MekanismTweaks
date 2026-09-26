@@ -17,6 +17,7 @@ public class MekanismTweaks {
     public static int maxMuffling;
     public static boolean energyBuffer;
     public static boolean bulkInstall;
+    public static int maxMinerOperations;
     public static int freeEnergy;
     public static int freeGas;
     public static float sustEnergy;
@@ -44,6 +45,7 @@ public class MekanismTweaks {
         sustGas = config.getFloat("sustGas", category, .5F, 0, 1,
                 "At 1, the effect is fully sustained, just like freeGas equals maxGas, as per vanilla mekanism. At 0, no effect is sustained, as per version 1.1.\n" +
                         "At 0.5, to overcome SpeedUpgradesInstalled, GasUpgradesInstalled more than or equal to its square is required. At 0.25, its cube is required. And so on.\n");
+        maxMinerOperations = config.getInt("maxMinerOperations", category, 64, 1, Integer.MAX_VALUE, "The most blocks a Digital Miner mines in one tick, when its Speed Upgrades make it faster than one block per tick. 1 turns this off, as per vanilla Mekanism.");
         config.save();
     }
 }

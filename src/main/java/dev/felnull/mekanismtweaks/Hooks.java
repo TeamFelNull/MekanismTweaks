@@ -12,6 +12,7 @@ import mekanism.common.tile.TileEntityChemicalCrystallizer;
 import mekanism.common.tile.TileEntityChemicalDissolutionChamber;
 import mekanism.common.tile.TileEntityChemicalOxidizer;
 import mekanism.common.tile.TileEntityContainerBlock;
+import mekanism.common.tile.TileEntityDigitalMiner;
 import mekanism.common.tile.TileEntityElectricBlock;
 import mekanism.common.tile.TileEntityMetallurgicInfuser;
 import mekanism.common.tile.component.TileComponentUpgrade;
@@ -69,7 +70,8 @@ public class Hooks {
      */
     public static int getTicks(IUpgradeTile tile, int def) {
         int ticks = UpgradeEffect.speed(tile, def);
-        return tile instanceof IRerun ? ticks : Math.max(1, ticks);
+        // the Digital Miner keeps the ticks as a delay, which must never get non-positive
+        return tile instanceof IRerun && !(tile instanceof TileEntityDigitalMiner) ? ticks : Math.max(1, ticks);
     }
 
     public static double getEnergyPerTick(IUpgradeTile tile, double def) {
@@ -221,7 +223,8 @@ public class Hooks {
         int acc = (stored == null ? 0 : stored) - reqTime;
         isInjecting.set(true);
         try {
-            while (acc >= 20) {
+            int maxExtra = machine instanceof TileEntityDigitalMiner ? MekanismTweaks.maxMinerOperations : Integer.MAX_VALUE;
+            for (int extra = 0; acc >= 20 && extra < maxExtra; extra++) {
                 acc -= 20;
                 ((IRerun) machine).mt$rerun();
                 if (!hasOperated.get()) {
@@ -230,6 +233,8 @@ public class Hooks {
                 }
                 hasOperated.set(false);
             }
+            // if the cap stopped the loop, do not save up the rest
+            acc = Math.min(acc, 19);
         } finally {
             isInjecting.set(false);
             hasOperated.set(false);
@@ -285,6 +290,10 @@ public class Hooks {
     }
 
     private static int ticksRequired(Object machine) {
+        if (machine instanceof TileEntityDigitalMiner) {
+            TileEntityDigitalMiner miner = (TileEntityDigitalMiner) machine;
+            return UpgradeEffect.speed(miner, miner.BASE_DELAY);
+        }
         if (machine instanceof TileEntityBasicMachine) return ((TileEntityBasicMachine<?, ?, ?>) machine).ticksRequired;
         if (machine instanceof TileEntityMetallurgicInfuser) return ((TileEntityMetallurgicInfuser) machine).ticksRequired;
         if (machine instanceof TileEntityChemicalCrystallizer) return ((TileEntityChemicalCrystallizer) machine).ticksRequired;
