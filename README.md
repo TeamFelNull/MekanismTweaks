@@ -1,6 +1,6 @@
 # MekanismTweaks
 
-**Higher Consumption, Higher Performance** — this branch (`1.19.2-new`) targets **Minecraft 1.19.2** with **Forge** and **Mekanism 10.3.x** (developed and tested with 10.3.9).
+**Higher Consumption, Higher Performance** — this branch (`1.19.2`) targets **Minecraft 1.19.2** with **Forge** and **Mekanism 10.3.x** (developed and tested with 10.3.9).
 
 Mekanism's Speed, Energy and Gas Upgrades are capped at 8 each. This mod lifts that cap, keeps the effect of every 8 upgrades as it is, lets machines do several operations in one tick when they are fast enough, and lets the effect of surplus Energy Upgrades decay against the Speed Upgrades, so more upgrades really mean more performance *and* more consumption.
 
@@ -15,7 +15,7 @@ Mekanism's Speed, Energy and Gas Upgrades are capped at 8 each. This mod lifts t
 
 - **Configurable upgrade limits.** The maximum number of Speed, Energy and Gas Upgrades a machine can hold is set in the config (64 each by default). Mekanism itself installs the whole stack in the upgrade slot at once.
 - **Same effect per 8 upgrades.** Mekanism divides the number of upgrades by the maximum to get the effect, so raising the maximum alone would weaken every upgrade. This mod keeps 8 upgrades as one unit of effect (the base is Mekanism's own `UpgradeModifier`).
-- **Several operations per tick.** When the time per operation drops below one tick, ordinary recipe machines (Enrichment Chamber, Crusher, Metallurgic Infuser, ...) do the rest of the operations in the same tick, up to `maxMachineOperations`. The progress bar shows full while a machine runs this fast. Every extra operation costs the energy of one tick.
+- **Several operations per tick.** When the time per operation drops below one tick, ordinary recipe machines and Factories (Enrichment Chamber, Crusher, Metallurgic Infuser, all tiers of Factories, ...) do the rest of the operations in the same tick, up to `maxMachineOperations`. The progress bar shows full while a machine runs this fast. Every extra operation costs the energy of one tick.
 - **Digital Miner, Electric Pump, Fluidic Plenisher and Formulaic Assemblicator.** Same for them, up to `maxMinerOperations`, `maxPumpOperations`, `maxPlenisherOperations` and `maxAssemblicatorOperations`.
 - **Digital Miner and Muffling.** The Digital Miner accepts Muffling Upgrades; fully muffled, its block break effect makes no sound.
 - **Energy Upgrades and the energy cost.** The energy needed per tick grows with the Speed Upgrades. Energy Upgrades save energy and enlarge the energy buffer, but only up to the Speed Upgrades (at least `freeEnergy`): the effect of Energy Upgrades beyond that decays (see `sustEnergy`). Gas Upgrades work the same way for the gas consumption.
@@ -50,7 +50,7 @@ Requires JDK 17 (ForgeGradle 5.1 with Gradle 7.6).
 
 ## Other versions
 
-The `1.21.1` branch targets Minecraft 1.21.1 (NeoForge, Mekanism 10.7.x), the `1.20.4` branch Minecraft 1.20.4 (NeoForge, Mekanism 10.5.x). The `1.7.10-7.1.2` and `1.7.10-9.1.x` branches target Mekanism for Minecraft 1.7.10. The `1.12.2`, `1.16.5`, `1.18.2` and `master` (1.19.2) branches are the older implementations for other Minecraft versions.
+Every Minecraft version has its own branch, named after the Minecraft version: `1.21.1`, `1.20.4`, `1.20.1`, `1.19.2`, `1.19.1`, `1.16.4`, `1.16.3`, `1.16.1`, `1.15.2`, `1.12.2`, `1.12.1`, `1.12` (Mekanism 9.4 - 9.8), `1.11.2` and `1.10.2` (Mekanism 9.x). The `1.7.10-7.1.2` and `1.7.10-9.1.x` branches target Mekanism 7.1.2 and 9.1.x for Minecraft 1.7.10. The `1.16.5`, `1.18.2` and `master` branches keep the older implementations.
 
 ## License
 
