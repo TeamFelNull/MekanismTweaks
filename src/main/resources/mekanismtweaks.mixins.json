@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.felnull.mekanismtweaks.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MixinMekanismUtils",
+    "MixinUpgrade",
+    "MixinUpgradeUtils"
+  ],
+  "client": [
+    "MixinGuiMekanism",
+    "MixinWarningTracker"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

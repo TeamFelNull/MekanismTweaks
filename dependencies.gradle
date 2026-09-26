@@ -1,9 +1,0 @@
-dependencies {
-    // Mekanism 9.1.1.1031 for 1.7.10 (obfuscated jar, deobfuscated for development)
-    devOnlyNonPublishable(rfg.deobf(project.files("libs/Mekanism-1.7.10-9.1.1.1031.jar")))
-    // Empty interfaces of the optional APIs that Mekanism's classes implement (IC2, CoFH, ComputerCraft), only to resolve supertypes at compile time
-    compileOnly(project.files("libs/compile-api-stubs.jar"))
-    // Mekanism needs ForgeMultipart (and CodeChicken libraries) at runtime; also at compile time for CodeChickenLib types
-    devOnlyNonPublishable("com.github.GTNewHorizons:ForgeMultipart:1.7.15:dev")
-    devOnlyNonPublishable("com.github.GTNewHorizons:CodeChickenCore:1.4.22:dev")
-}

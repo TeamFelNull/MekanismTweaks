@@ -1,83 +1,82 @@
 package dev.felnull.mekanismtweaks;
 
-import mekanism.api.MekanismConfig;
-import mekanism.common.Upgrade;
-import mekanism.common.base.IUpgradeTile;
+import mekanism.api.Upgrade;
+import mekanism.common.config.MekanismConfig;
+import mekanism.common.tile.interfaces.IUpgradeTile;
 
 public class UpgradeEffect {
 
     /**
-     * An UpgradesInstalled fraction.
-     * Extend the simple effects of upgrades.
+     * Speed upgrades more than this many more than Energy Upgrades make the machine consume more energy than it can store.
      */
-    public static float fraction(IUpgradeTile tile, Upgrade upgrade) {
-        float defaultMax = upgrade == Upgrade.SPEED || upgrade == Upgrade.ENERGY || upgrade == Upgrade.GAS ? 8 : upgrade.getMax();
-        return tile.getComponent().getUpgrades(upgrade) / defaultMax;
+    public static final int WARN_DIFFERENCE = 10;
+
+    /**
+     * The UpgradesInstalled fraction that Mekanism's formulas turn into effects (energy per tick, ticks required, energy capacity, ...).
+     * Eight upgrades are one unit of effect for Speed, Energy and Chemical Upgrades, as per vanilla mekanism, however many of them can be installed.
+     * The effect of Energy and Chemical Upgrades beyond the Speed Upgrades decays.
+     */
+    public static double fraction(IUpgradeTile tile, Upgrade type) {
+        if (!tile.supportsUpgrade(type)) {
+            return 0;
+        }
+        int count = tile.getComponent().getUpgrades(type);
+        int speed = tile.getComponent().getUpgrades(Upgrade.SPEED);
+        return switch (type) {
+            case SPEED -> count / 8D;
+            case ENERGY -> decayed(speed, count, Config.freeEnergy(), Config.sustEnergy());
+            case CHEMICAL -> decayed(speed, count, Config.freeChemical(), Config.sustChemical());
+            default -> count / (double) type.getMax();
+        };
     }
 
     /**
-     * Required ticks per operation.
-     * Extend the speed effect of SpeedUpgrade. If performing more than one operation within a single tick, treat the excess progress as negative ticks required. (one excess operation per -20 ticks)
+     * The fraction of the Energy Upgrades of an item form of a machine, where the Speed Upgrades are not known.
      */
-    public static int speed(IUpgradeTile tile, int def) {
-        double ticks = def * effect(-fraction(tile, Upgrade.SPEED));
-        return (int) (ticks > 2 ? ticks : ticks > 1 ? 20 * (ticks - 2) + 1 : -20 / ticks + 1);
-    }
-
-    /**
-     * Energy to consume.
-     * Extend the energy-saving effect of EnergyUpgrade.
-     * The energy-saving effect of excess EnergyUpgrades decays based on the SpeedUpgradesInstalled.
-     */
-    public static double energy(IUpgradeTile tile, double def) {
-        return def * effect(2 * fraction(tile, Upgrade.SPEED) - decayed(tile, Upgrade.ENERGY));
-    }
-
-    /**
-     * Energy buffer amount.
-     * If necessary, the energy-buffer increment of excess EnergyUpgrades decays based on the SpeedUpgradesInstalled.
-     */
-    public static double energyBuffer(IUpgradeTile tile, double def) {
-        return def * effect(MekanismTweaks.energyBuffer ? decayed(tile, Upgrade.ENERGY) : fraction(tile, Upgrade.ENERGY));
-    }
-
-    /**
-     * Gas to consume. Extend the gas-saving effect of GasUpgrade.
-     * The gas-saving effect of excess GasUpgrades decays based on the SpeedUpgradesInstalled.
-     */
-    public static double gas(IUpgradeTile tile, int def) {
-        if (tile.getComponent().supports(Upgrade.GAS))
-            return def * effect(2 * fraction(tile, Upgrade.SPEED) - decayed(tile, Upgrade.GAS));
-        else
-            return def * effect(fraction(tile, Upgrade.SPEED));
+    public static double itemEnergyFraction(int energyUpgrades) {
+        return decayed(0, energyUpgrades, Config.freeEnergy(), Config.sustEnergy());
     }
 
     /**
      * Decayed UpgradesInstalled fraction.
+     * Up to the Speed Upgrades (or the free amount) the upgrades take full effect, the surplus decays based on the Speed Upgrades.
+     *
+     * @param speed   Speed Upgrades installed
+     * @param count   upgrades installed
+     * @param free    the minimum guaranteed amount that has effect without decay
+     * @param sustain how much of the effect of the surplus is sustained
      */
-    public static double decayed(IUpgradeTile tile, Upgrade upgrade) {
-        int m = tile.getComponent().getUpgrades(Upgrade.SPEED);
-        int x = tile.getComponent().getUpgrades(upgrade);
-        double s = upgrade == Upgrade.ENERGY ? MekanismTweaks.sustEnergy :
-                   upgrade == Upgrade.GAS ? MekanismTweaks.sustGas : 0;
-        int f = upgrade == Upgrade.ENERGY ? MekanismTweaks.freeEnergy :
-                upgrade == Upgrade.GAS ? MekanismTweaks.freeGas : 0;
-        int n = Math.max(m, f);
-        if (s == 0) return Math.min(x, n) / 8D;
-        return (x <= n ? x : n + (x - n) / Math.max(1, Math.pow(m, Math.log(1 / s) / Math.log(2)) - 1)) / 8;
+    public static double decayed(int speed, int count, int free, double sustain) {
+        int n = Math.max(speed, free);
+        if (sustain == 0) {
+            return Math.min(count, n) / 8D;
+        }
+        double effective = count <= n ? count : n + (count - n) / Math.max(1, Math.pow(speed, Math.log(1 / sustain) / Math.log(2)) - 1);
+        return effective / 8D;
     }
 
     /**
      * Convert the UpgradesInstalled fraction into an effect value.
      */
     public static double effect(double fraction) {
-        return Math.pow(MekanismConfig.general.maxUpgradeMultiplier, fraction);
+        return Math.pow(MekanismConfig.general.maxUpgradeMultiplier.get(), fraction);
+    }
+
+    /**
+     * Whether the machine has too many more Speed Upgrades than Energy Upgrades.
+     */
+    public static boolean needsEnergyUpgrades(IUpgradeTile tile) {
+        return tile.supportsUpgrade(Upgrade.ENERGY)
+                && tile.getComponent().getUpgrades(Upgrade.SPEED) - tile.getComponent().getUpgrades(Upgrade.ENERGY) > WARN_DIFFERENCE;
     }
 
     /**
      * Appropriate exponential notation.
      */
     public static String exponential(double d) {
+        if (d <= 0 || Double.isNaN(d) || Double.isInfinite(d)) {
+            return String.valueOf(d);
+        }
         int significant = 4;
         int exp = (int) Math.floor(Math.log10(d));
         d = d * Math.pow(10, -exp);
