@@ -5,7 +5,7 @@ import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
 
-@Mod(modid = "mekanismtweaks", name = "MekanismTweaks", version = "1.7.10-7.1.2", dependencies = "required-after:Mekanism@[7.1,8.0)")
+@Mod(modid = "mekanismtweaks", name = "MekanismTweaks", version = "1.7.10(7.1.2)-1.2", dependencies = "required-after:Mekanism@[7.1,8.0)")
 public class MekanismTweaks {
 
     /**

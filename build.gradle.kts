@@ -4,4 +4,4 @@ plugins {
 }
 
 // Version is "<Minecraft version>-<targeted Mekanism version>"
-version = "1.7.10-7.1.2"
+version = "1.7.10(7.1.2)-1.2"
