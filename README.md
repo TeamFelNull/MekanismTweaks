@@ -19,7 +19,7 @@ Mekanism's Speed and Energy Upgrades are capped at 8 each. This mod lifts that c
 - **Energy costs scale with speed.** The energy per tick grows with the Speed Upgrades. Energy Upgrades save energy and enlarge the energy buffer, but the effect of Energy Upgrades beyond the Speed Upgrades decays (see `freeEnergy` and `sustEnergy`). Gas consumption of the Chemical Injection-type machines scales the same way.
 - **Warning icon.** When a machine has more than 10 more Speed Upgrades than Energy Upgrades, a blinking yellow warning icon appears below the upgrade panel of its GUI. Hover it: *Insert Energy Upgrades!* Without enough Energy Upgrades the energy needed per tick can exceed what the machine can store, and it stops working.
 
-Supported machines: electric machines (Enrichment Chamber, Crusher, ...), advanced electric machines (Purification Chamber, Chemical Injection Chamber, ...), chance machines, Pressurized Reaction Chamber, Metallurgic Infuser, Chemical Oxidizer, Chemical Dissolution Chamber and Chemical Crystallizer. Factories get the upgrade limits and the energy scaling, but never take less than one tick per operation.
+Supported machines: electric machines (Enrichment Chamber, Crusher, ...), advanced electric machines (Purification Chamber, Chemical Injection Chamber, ...), chance machines, Pressurized Reaction Chamber, Metallurgic Infuser, Chemical Oxidizer, Chemical Dissolution Chamber, Chemical Crystallizer and Factories (all tiers). Other machines (Digital Miner, Electric Pump, ...) get the upgrade limits and the energy scaling, but never take less than one tick per operation.
 
 ## Config
 
