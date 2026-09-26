@@ -13,6 +13,7 @@
     "MixinUpgrade",
     "machine.ChemicalDissolutionChamber",
     "machine.ElectricPump",
+    "machine.Factory",
     "machine.FormulaicAssemblicatorGui",
     "machine.FluidicPlenisher",
     "machine.FormulaicAssemblicator",
