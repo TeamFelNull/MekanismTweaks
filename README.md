@@ -1,6 +1,6 @@
 # MekanismTweaks
 
-**Higher Consumption, Higher Performance** — this branch (`1.16.5-new`) targets **Minecraft 1.16.5** with **Forge** and **Mekanism 10.1.x** (developed and tested with 10.1.2).
+**Higher Consumption, Higher Performance** — this branch (`1.16.4`) targets **Minecraft 1.16.4** with **Forge** and **Mekanism 10.0.x** (developed and tested with 10.0.19).
 
 Mekanism's Speed, Energy and Gas Upgrades are capped at 8 each. This mod lifts that cap, keeps the effect of every 8 upgrades as it is, lets machines do several operations in one tick when they are fast enough, and lets the effect of surplus Energy Upgrades decay against the Speed Upgrades, so more upgrades really mean more performance *and* more consumption.
 
@@ -8,8 +8,8 @@ Mekanism's Speed, Energy and Gas Upgrades are capped at 8 each. This mod lifts t
 
 ## Requirements
 
-- Minecraft 1.16.5 with Forge 36
-- Mekanism 10.1.x for 1.16.5
+- Minecraft 1.16.4 with Forge 35
+- Mekanism 10.0.x for 1.16.4
 
 ## Features
 
@@ -20,7 +20,8 @@ Mekanism's Speed, Energy and Gas Upgrades are capped at 8 each. This mod lifts t
 - **Digital Miner and Muffling.** The Digital Miner accepts Muffling Upgrades; fully muffled, its block break effect makes no sound.
 - **Energy Upgrades and the energy cost.** The energy needed per tick grows with the Speed Upgrades. Energy Upgrades save energy and enlarge the energy buffer, but only up to the Speed Upgrades (at least `freeEnergy`): the effect of Energy Upgrades beyond that decays (see `sustEnergy`). Gas Upgrades work the same way for the gas consumption.
 - **Effect display.** The upgrade screen shows the effect that is really applied, in exponential notation.
-- **Warning.** When a machine has more than 10 more Speed Upgrades than Energy Upgrades, the yellow warning tab of its GUI shows *Insert Energy Upgrades!* Without enough Energy Upgrades the energy needed per tick can exceed what the machine can store, and it stops working.
+
+**Note:** Mekanism 10.0.x has no warning tab yet (it was added in 10.1.0), so this version does not show the "Insert Energy Upgrades!" warning. Without enough Energy Upgrades the energy needed per tick can exceed what a machine can store, and it stops working: install Energy Upgrades along with the Speed Upgrades.
 
 ## Config
 

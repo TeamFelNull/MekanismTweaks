@@ -16,10 +16,6 @@
     "MixinUpgrade",
     "MixinUpgradeUtils"
   ],
-  "client": [
-    "MixinGuiMekanism",
-    "MixinWarningTracker"
-  ],
   "injectors": {
     "defaultRequire": 1
   }

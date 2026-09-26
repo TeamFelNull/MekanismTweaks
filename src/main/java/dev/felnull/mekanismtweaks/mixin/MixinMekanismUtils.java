@@ -27,8 +27,8 @@ public class MixinMekanismUtils {
      * Keep the effect of every 8 upgrades, however many can be installed, and let the effect of surplus Energy and Chemical Upgrades decay.
      */
     @Inject(method = "fractionUpgrades", at = @At("HEAD"), cancellable = true)
-    private static void mekanismtweaks$fraction(IUpgradeTile tile, Upgrade type, CallbackInfoReturnable<Double> cir) {
-        cir.setReturnValue(UpgradeEffect.fraction(tile, type));
+    private static void mekanismtweaks$fraction(IUpgradeTile tile, Upgrade type, CallbackInfoReturnable<Float> cir) {
+        cir.setReturnValue((float) UpgradeEffect.fraction(tile, type));
     }
 
     /**

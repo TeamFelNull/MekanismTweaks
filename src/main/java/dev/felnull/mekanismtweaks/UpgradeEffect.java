@@ -17,7 +17,7 @@ public class UpgradeEffect {
      * The effect of Energy and Gas Upgrades beyond the Speed Upgrades decays.
      */
     public static double fraction(IUpgradeTile tile, Upgrade type) {
-        if (!tile.supportsUpgrade(type)) {
+        if (!tile.getComponent().supports(type)) {
             return 0;
         }
         int count = tile.getComponent().getUpgrades(type);
@@ -68,7 +68,7 @@ public class UpgradeEffect {
      * Whether the machine has too many more Speed Upgrades than Energy Upgrades.
      */
     public static boolean needsEnergyUpgrades(IUpgradeTile tile) {
-        return tile.supportsUpgrade(Upgrade.ENERGY)
+        return tile.getComponent().supports(Upgrade.ENERGY)
                 && tile.getComponent().getUpgrades(Upgrade.SPEED) - tile.getComponent().getUpgrades(Upgrade.ENERGY) > WARN_DIFFERENCE;
     }
 

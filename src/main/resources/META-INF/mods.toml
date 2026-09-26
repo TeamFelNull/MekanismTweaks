@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[36,)"
+loaderVersion = "[35,)"
 license = "Unlicense"
 
 [[mods]]
@@ -16,20 +16,20 @@ and lets the effect of surplus Energy Upgrades decay against the Speed Upgrades.
 [[dependencies.mekanismtweaks]]
 modId = "forge"
 mandatory = true
-versionRange = "[36,)"
+versionRange = "[35,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.mekanismtweaks]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.16.5]"
+versionRange = "[1.16.4]"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.mekanismtweaks]]
 modId = "mekanism"
 mandatory = true
-versionRange = "[10.1,10.2)"
+versionRange = "[10.0,10.1)"
 ordering = "AFTER"
 side = "BOTH"
