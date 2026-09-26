@@ -49,7 +49,7 @@ Requires JDK 21.
 
 ## Other versions
 
-The `1.7.10-7.1.2` and `1.7.10-9.1.x` branches target Mekanism for Minecraft 1.7.10. The `1.12.2`, `1.16.5`, `1.18.2` and `master` (1.19.2) branches target other Minecraft and Mekanism versions.
+Every Minecraft version has its own branch, named after the Minecraft version: `1.21.1`, `1.20.4`, `1.20.1`, `1.19.2`, `1.19.1`, `1.16.4`, `1.16.3`, `1.16.1`, `1.15.2`, `1.12.2`, `1.12.1`, `1.12` (Mekanism 9.4 - 9.8), `1.11.2` and `1.10.2` (Mekanism 9.x). The `1.7.10-7.1.2` and `1.7.10-9.1.x` branches target Mekanism 7.1.2 and 9.1.x for Minecraft 1.7.10. The `1.16.5`, `1.18.2` and `master` branches keep the older implementations.
 
 ## License
 
