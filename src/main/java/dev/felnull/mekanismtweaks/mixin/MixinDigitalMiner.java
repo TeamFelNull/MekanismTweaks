@@ -25,9 +25,6 @@ import java.util.BitSet;
 public abstract class MixinDigitalMiner {
 
     @Shadow
-    private boolean hasOverflow;
-
-    @Shadow
     private Long2ObjectMap<BitSet> oresToMine;
 
     @Shadow
@@ -51,7 +48,7 @@ public abstract class MixinDigitalMiner {
         }
         FloatingLong energyPerTick = energyContainer.getEnergyPerTick();
         for (int i = 1; i < operations; i++) {
-            if (hasOverflow || oresToMine.isEmpty()) {
+            if (oresToMine.isEmpty()) {
                 break;
             }
             if (!energyContainer.extract(energyPerTick, Action.SIMULATE, AutomationType.INTERNAL).equals(energyPerTick)) {

@@ -1,6 +1,6 @@
 # MekanismTweaks
 
-**Higher Consumption, Higher Performance** — this branch (`1.19.2-new`) targets **Minecraft 1.19.2** with **Forge** and **Mekanism 10.3.x** (developed and tested with 10.3.9).
+**Higher Consumption, Higher Performance** — this branch (`1.19.1`) targets **Minecraft 1.19.1** with **Forge** and **Mekanism 10.3.x** (developed and tested with 10.3.1).
 
 Mekanism's Speed, Energy and Gas Upgrades are capped at 8 each. This mod lifts that cap, keeps the effect of every 8 upgrades as it is, lets machines do several operations in one tick when they are fast enough, and lets the effect of surplus Energy Upgrades decay against the Speed Upgrades, so more upgrades really mean more performance *and* more consumption.
 
@@ -8,8 +8,8 @@ Mekanism's Speed, Energy and Gas Upgrades are capped at 8 each. This mod lifts t
 
 ## Requirements
 
-- Minecraft 1.19.2 with Forge 43
-- Mekanism 10.3.x for 1.19.2
+- Minecraft 1.19.1 with Forge 42
+- Mekanism 10.3.x for 1.19.1
 
 ## Features
 
