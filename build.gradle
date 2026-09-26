@@ -22,6 +22,7 @@ group = mod_group
 archivesBaseName = "$mod_id-$minecraft_version"
 
 sourceCompatibility = targetCompatibility = '1.8'
+tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
 compileJava {
     sourceCompatibility = targetCompatibility = '1.8'
 }
@@ -65,6 +66,7 @@ dependencies {
     }
 
     compile 'curse.maven:Mekanism-268560:2835175'
+    compileOnly files('libs/compile-api-stubs.jar')
     runtime 'mezz.jei:jei_1.12.2:4.16.1.302'
 }
 
