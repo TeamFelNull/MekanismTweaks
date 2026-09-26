@@ -28,6 +28,7 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
     private static final String HOOKS = "dev/felnull/mekanismtweaks/Hooks";
     private static final String CLIENT_HOOKS = "dev/felnull/mekanismtweaks/ClientHooks";
     private static final String RERUN = "dev/felnull/mekanismtweaks/IRerun";
+    private static final String MINER = "mekanism/common/tile/TileEntityDigitalMiner";
 
     private static final String UTILS = "mekanism/common/util/MekanismUtils";
     private static final String UPGRADE = "mekanism/common/Upgrade";
@@ -52,7 +53,9 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
             "mekanism.common.tile.TileEntityChemicalOxidizer",
             "mekanism.common.tile.TileEntityChemicalDissolutionChamber",
             "mekanism.common.tile.TileEntityDigitalMiner",
-            "mekanism.common.tile.TileEntityElectricPump"));
+            "mekanism.common.tile.TileEntityElectricPump",
+            "mekanism.common.tile.TileEntityFluidicPlenisher",
+            "mekanism.common.tile.TileEntityFormulaicAssemblicator"));
 
     /**
      * The classes that have their own recalculateUpgradables.
@@ -64,7 +67,9 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
             "mekanism.common.tile.TileEntityChemicalCrystallizer",
             "mekanism.common.tile.TileEntityChemicalOxidizer",
             "mekanism.common.tile.TileEntityChemicalDissolutionChamber",
-            "mekanism.common.tile.TileEntityElectricPump"));
+            "mekanism.common.tile.TileEntityElectricPump",
+            "mekanism.common.tile.TileEntityFluidicPlenisher",
+            "mekanism.common.tile.TileEntityFormulaicAssemblicator"));
 
     /**
      * The classes that have their own getScaledProgress.
@@ -89,7 +94,8 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
         boolean machine = MACHINES.contains(transformedName);
         boolean recalculating = RECALCULATING.contains(transformedName);
         boolean progress = PROGRESS.contains(transformedName);
-        if (!(utils || upgrade || statUtils || itemUpgrade || component || gui || machine || recalculating || progress)) return bytes;
+        boolean assemblicatorGui = transformedName.equals("mekanism.client.gui.GuiFormulaicAssemblicator");
+        if (!(utils || upgrade || statUtils || itemUpgrade || component || gui || machine || recalculating || progress || assemblicatorGui)) return bytes;
 
         ClassNode node = new ClassNode();
         new ClassReader(bytes).accept(node, 0);
@@ -103,6 +109,7 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
         if (machine) transformMachine(node);
         if (recalculating) transformRecalculating(node);
         if (progress) transformProgress(node);
+        if (assemblicatorGui) transformAssemblicatorGui(node);
 
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         node.accept(writer);
@@ -274,6 +281,21 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
                         // the Electric Pump: it has operated only if suck(true) has really pumped
                         method.instructions.set(insn, new MethodInsnNode(INVOKESTATIC, HOOKS, "suck",
                                 "(Lmekanism/common/tile/TileEntityElectricPump;Z)Z", false));
+                    } else if (insn.getOpcode() == INVOKESPECIAL && ((MethodInsnNode) insn).name.equals("doPlenish")
+                            && ((MethodInsnNode) insn).desc.equals("()V")) {
+                        // the Fluidic Plenisher
+                        method.instructions.insertBefore(insn, new MethodInsnNode(INVOKESTATIC, HOOKS, "operated", "()V", false));
+                    } else if (insn.getOpcode() == INVOKESPECIAL && ((MethodInsnNode) insn).name.equals("doSingleCraft")
+                            && ((MethodInsnNode) insn).desc.equals("()Z")) {
+                        // the Formulaic Assemblicator: it has operated only if it has really crafted (the result is left on the stack)
+                        InsnList list = new InsnList();
+                        list.add(new InsnNode(DUP));
+                        list.add(new MethodInsnNode(INVOKESTATIC, HOOKS, "craftedFlag", "(Z)V", false));
+                        method.instructions.insert(insn, list);
+                    } else if (node.name.equals(MINER) && insn.getOpcode() == INVOKEVIRTUAL && isPlayAux((MethodInsnNode) insn)) {
+                        // the block break effect of the Digital Miner is muffled by fully installed Muffling Upgrades
+                        method.instructions.set(insn, new MethodInsnNode(INVOKESTATIC, HOOKS, "playAux",
+                                "(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;IIIII)V", false));
                     } else if (insn.getOpcode() == RETURN) {
                         InsnList list = new InsnList();
                         list.add(new VarInsnNode(ALOAD, 0));
@@ -281,9 +303,55 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
                         method.instructions.insertBefore(insn, list);
                     }
                 }
+                if (node.name.equals(MINER)) {
+                    // remember which miner is being updated, for the block break effect
+                    InsnList list = new InsnList();
+                    list.add(new VarInsnNode(ALOAD, 0));
+                    list.add(new MethodInsnNode(INVOKESTATIC, HOOKS, "enterMiner", "(Ljava/lang/Object;)V", false));
+                    method.instructions.insert(list);
+                }
+            } else if (node.name.equals(MINER) && method.name.equals("<init>")) {
+                // the Digital Miner supports Muffling Upgrades
+                for (AbstractInsnNode insn : method.instructions.toArray()) {
+                    if (insn.getOpcode() == RETURN) {
+                        InsnList list = new InsnList();
+                        list.add(new VarInsnNode(ALOAD, 0));
+                        list.add(new FieldInsnNode(GETFIELD, node.name, "upgradeComponent", "Lmekanism/common/tile/component/TileComponentUpgrade;"));
+                        list.add(new FieldInsnNode(GETSTATIC, UPGRADE, "MUFFLING", "L" + UPGRADE + ";"));
+                        list.add(new MethodInsnNode(INVOKEVIRTUAL, "mekanism/common/tile/component/TileComponentUpgrade", "setSupported", "(L" + UPGRADE + ";)V", false));
+                        method.instructions.insertBefore(insn, list);
+                    }
+                }
             }
         }
         if (updates == 0) throw new IllegalStateException("MekanismTweaks: onUpdate not found in " + node.name);
+    }
+
+    /**
+     * World.playAuxSFXAtEntity: MCP name in a development environment, SRG name otherwise.
+     */
+    private boolean isPlayAux(MethodInsnNode call) {
+        return call.desc.equals("(Lnet/minecraft/entity/player/EntityPlayer;IIIII)V")
+                && (call.name.equals("func_72889_a") || call.name.equals("playAuxSFXAtEntity"));
+    }
+
+    /**
+     * The progress bar of the Formulaic Assemblicator GUI reads ticksRequired, which is negative while it crafts more than once per tick.
+     */
+    private void transformAssemblicatorGui(ClassNode node) {
+        int count = 0;
+        for (MethodNode method : node.methods) {
+            for (AbstractInsnNode insn : method.instructions.toArray()) {
+                if (insn.getOpcode() == GETFIELD) {
+                    FieldInsnNode field = (FieldInsnNode) insn;
+                    if (field.owner.equals("mekanism/common/tile/TileEntityFormulaicAssemblicator") && field.name.equals("ticksRequired")) {
+                        method.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, HOOKS, "guiTicks", "(I)I", false));
+                        count++;
+                    }
+                }
+            }
+        }
+        if (count == 0) throw new IllegalStateException("MekanismTweaks: ticksRequired not found in " + node.name);
     }
 
     private void transformRecalculating(ClassNode node) {

@@ -15,11 +15,14 @@ import mekanism.common.tile.TileEntityContainerBlock;
 import mekanism.common.tile.TileEntityDigitalMiner;
 import mekanism.common.tile.TileEntityElectricBlock;
 import mekanism.common.tile.TileEntityElectricPump;
+import mekanism.common.tile.TileEntityFluidicPlenisher;
+import mekanism.common.tile.TileEntityFormulaicAssemblicator;
 import mekanism.common.tile.TileEntityMetallurgicInfuser;
 import mekanism.common.tile.component.TileComponentUpgrade;
 import mekanism.common.util.LangUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StatUtils;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -194,6 +197,45 @@ public class Hooks {
     }
 
     /**
+     * Called with the result of the Formulaic Assemblicator's doSingleCraft: it has operated only if it has really crafted.
+     */
+    public static void craftedFlag(boolean crafted) {
+        if (crafted) {
+            hasOperated.set(true);
+        }
+    }
+
+    /**
+     * The Digital Miner that is being updated, for the block break effect that is called from its update.
+     */
+    private static TileEntityDigitalMiner currentMiner;
+
+    /**
+     * Called at the head of the Digital Miner's update.
+     */
+    public static void enterMiner(Object miner) {
+        currentMiner = (TileEntityDigitalMiner) miner;
+    }
+
+    /**
+     * Stands in for the block break effect of the Digital Miner. Fully muffled, it makes no sound.
+     */
+    public static void playAux(World world, EntityPlayer player, int id, int x, int y, int z, int data) {
+        TileEntityDigitalMiner miner = currentMiner;
+        if (miner != null && miner.getComponent().getUpgrades(Upgrade.MUFFLING) >= Upgrade.MUFFLING.getMax()) {
+            return;
+        }
+        world.playAuxSFXAtEntity(player, id, x, y, z, data);
+    }
+
+    /**
+     * The progress bar of the Formulaic Assemblicator: ticks required are negative while it crafts more than once per tick.
+     */
+    public static int guiTicks(int ticksRequired) {
+        return ticksRequired < 0 ? 20 : ticksRequired;
+    }
+
+    /**
      * Stands in for the pump's calls of suck in its update. The pump has performed an operation only if it has really pumped.
      */
     public static boolean suck(TileEntityElectricPump pump, boolean take) {
@@ -236,7 +278,9 @@ public class Hooks {
         isInjecting.set(true);
         try {
             int maxExtra = machine instanceof TileEntityDigitalMiner ? MekanismTweaks.maxMinerOperations :
-                    machine instanceof TileEntityElectricPump ? MekanismTweaks.maxPumpOperations : Integer.MAX_VALUE;
+                    machine instanceof TileEntityElectricPump ? MekanismTweaks.maxPumpOperations :
+                            machine instanceof TileEntityFluidicPlenisher ? MekanismTweaks.maxPlenisherOperations :
+                                    machine instanceof TileEntityFormulaicAssemblicator ? MekanismTweaks.maxAssemblicatorOperations : Integer.MAX_VALUE;
             for (int extra = 0; acc >= 20 && extra < maxExtra; extra++) {
                 acc -= 20;
                 ((IRerun) machine).mt$rerun();
@@ -304,6 +348,8 @@ public class Hooks {
 
     private static int ticksRequired(Object machine) {
         if (machine instanceof TileEntityElectricPump) return ((TileEntityElectricPump) machine).ticksRequired;
+        if (machine instanceof TileEntityFluidicPlenisher) return ((TileEntityFluidicPlenisher) machine).ticksRequired;
+        if (machine instanceof TileEntityFormulaicAssemblicator) return ((TileEntityFormulaicAssemblicator) machine).ticksRequired;
         if (machine instanceof TileEntityDigitalMiner) {
             TileEntityDigitalMiner miner = (TileEntityDigitalMiner) machine;
             return UpgradeEffect.speed(miner, miner.BASE_DELAY);

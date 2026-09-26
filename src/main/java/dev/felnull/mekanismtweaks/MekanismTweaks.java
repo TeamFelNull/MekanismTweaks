@@ -18,6 +18,8 @@ public class MekanismTweaks {
     public static boolean energyBuffer;
     public static boolean bulkInstall;
     public static int maxPumpOperations;
+    public static int maxPlenisherOperations;
+    public static int maxAssemblicatorOperations;
     public static int maxMinerOperations;
     public static int freeEnergy;
     public static int freeGas;
@@ -48,6 +50,8 @@ public class MekanismTweaks {
                         "At 0.5, to overcome SpeedUpgradesInstalled, GasUpgradesInstalled more than or equal to its square is required. At 0.25, its cube is required. And so on.\n");
         maxMinerOperations = config.getInt("maxMinerOperations", category, 64, 1, Integer.MAX_VALUE, "The most blocks a Digital Miner mines in one tick, when its Speed Upgrades make it faster than one block per tick. 1 turns this off, as per vanilla Mekanism.");
         maxPumpOperations = config.getInt("maxPumpOperations", category, 64, 1, Integer.MAX_VALUE, "The most times an Electric Pump pumps in one tick, when its Speed Upgrades make it faster than one operation per tick. 1 turns this off, as per vanilla Mekanism.");
+        maxPlenisherOperations = config.getInt("maxPlenisherOperations", category, 64, 1, Integer.MAX_VALUE, "The most times a Fluidic Plenisher plenishes in one tick, when its Speed Upgrades make it faster than one operation per tick. 1 turns this off, as per vanilla Mekanism.");
+        maxAssemblicatorOperations = config.getInt("maxAssemblicatorOperations", category, 64, 1, Integer.MAX_VALUE, "The most crafts a Formulaic Assemblicator does in one tick, when its Speed Upgrades make it faster than one craft per tick. 1 turns this off, as per vanilla Mekanism.");
         config.save();
     }
 }
