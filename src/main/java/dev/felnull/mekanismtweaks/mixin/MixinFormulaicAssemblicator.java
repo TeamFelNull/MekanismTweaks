@@ -1,7 +1,5 @@
 package dev.felnull.mekanismtweaks.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.felnull.mekanismtweaks.Config;
 import dev.felnull.mekanismtweaks.UpgradeEffect;
 import mekanism.api.Action;
@@ -12,22 +10,28 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(TileEntityFormulaicAssemblicator.class)
+@Mixin(value = TileEntityFormulaicAssemblicator.class, remap = false)
 public abstract class MixinFormulaicAssemblicator {
 
     @Shadow
     @Final
     private static int BASE_TICKS_REQUIRED;
 
+    @Shadow
+    private boolean doSingleCraft() {
+        return false;
+    }
+
     /**
      * Mekanism's Formulaic Assemblicator crafts once per tick at the most, however many Speed Upgrades it has.
      * Let it craft more in the same tick, like the other machines do, when the time per craft is below one tick.
      * Every extra craft costs the energy of one tick.
      */
-    @WrapOperation(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityFormulaicAssemblicator;doSingleCraft()Z"))
-    private boolean mekanismtweaks$craftMore(TileEntityFormulaicAssemblicator assemblicator, Operation<Boolean> original) {
-        boolean crafted = original.call(assemblicator);
+    @Redirect(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityFormulaicAssemblicator;doSingleCraft()Z"))
+    private boolean mekanismtweaks$craftMore(TileEntityFormulaicAssemblicator assemblicator) {
+        boolean crafted = doSingleCraft();
         if (!crafted) {
             return false;
         }
@@ -38,7 +42,7 @@ public abstract class MixinFormulaicAssemblicator {
                 break;
             }
             assemblicator.getEnergyContainer().extract(energyPerTick, Action.EXECUTE, AutomationType.INTERNAL);
-            if (!original.call(assemblicator)) {
+            if (!doSingleCraft()) {
                 break;
             }
         }

@@ -1,7 +1,19 @@
+buildscript {
+    repositories {
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
 plugins {
     id 'java-library'
-    id 'net.neoforged.gradle.userdev' version '7.0.106'
+    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
 }
+
+apply plugin: 'org.spongepowered.mixin'
 
 version = mod_version
 group = mod_group
@@ -11,6 +23,33 @@ base {
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+        client {
+        }
+        server {
+            args '--nogui'
+        }
+    }
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+    config "${mod_id}.mixins.json"
+}
 
 repositories {
     mavenCentral()
@@ -23,23 +62,11 @@ repositories {
     }
 }
 
-runs {
-    configureEach {
-        modSource project.sourceSets.main
-    }
-    client {
-        systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
-    }
-    server {
-        programArgument '--nogui'
-    }
-}
-
 dependencies {
-    implementation "net.neoforged:neoforge:${neo_version}"
-    // Mekanism 10.5.x for 1.20.4. The api jar holds mekanism.api (Upgrade, ...), the main jar holds the rest.
-    compileOnly "mekanism:Mekanism:${mekanism_version}:api"
-    implementation "mekanism:Mekanism:${mekanism_version}"
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    // Mekanism 10.4.x for 1.20.1: the "all" jar holds mekanism.api (Upgrade, ...) and the rest
+    implementation fg.deobf("mekanism:Mekanism:${mekanism_version}:all")
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -47,8 +74,10 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 // mods.toml takes the mod version from the jar (${file.jarVersion}), which reads this manifest entry
-tasks.named('jar') {
+jar {
     manifest {
         attributes('Implementation-Version': project.version)
     }
 }
+
+jar.finalizedBy('reobfJar')

@@ -2,18 +2,24 @@ package dev.felnull.mekanismtweaks.mixin;
 
 import dev.felnull.mekanismtweaks.Config;
 import dev.felnull.mekanismtweaks.UpgradeEffect;
+import mekanism.api.NBTConstants;
 import mekanism.api.Upgrade;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.tile.interfaces.IUpgradeTile;
 import mekanism.common.tile.prefab.TileEntityProgressMachine;
+import mekanism.common.util.ItemDataUtils;
 import mekanism.common.util.MekanismUtils;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(MekanismUtils.class)
+import java.util.Map;
+
+@Mixin(value = MekanismUtils.class, remap = false)
 public class MixinMekanismUtils {
 
     /**
@@ -50,8 +56,13 @@ public class MixinMekanismUtils {
     /**
      * The item form of a machine, where only the number of Energy Upgrades is known.
      */
-    @Inject(method = "getMaxEnergy(ILmekanism/api/math/FloatingLong;)Lmekanism/api/math/FloatingLong;", at = @At("HEAD"), cancellable = true)
-    private static void mekanismtweaks$itemMaxEnergy(int energyUpgrades, FloatingLong def, CallbackInfoReturnable<FloatingLong> cir) {
+    @Inject(method = "getMaxEnergy(Lnet/minecraft/world/item/ItemStack;Lmekanism/api/math/FloatingLong;)Lmekanism/api/math/FloatingLong;", at = @At("HEAD"), cancellable = true)
+    private static void mekanismtweaks$itemMaxEnergy(ItemStack stack, FloatingLong def, CallbackInfoReturnable<FloatingLong> cir) {
+        int energyUpgrades = 0;
+        if (ItemDataUtils.hasData(stack, NBTConstants.COMPONENT_UPGRADE, Tag.TAG_COMPOUND)) {
+            Map<Upgrade, Integer> upgrades = Upgrade.buildMap(ItemDataUtils.getCompound(stack, NBTConstants.COMPONENT_UPGRADE));
+            energyUpgrades = upgrades.getOrDefault(Upgrade.ENERGY, 0);
+        }
         cir.setReturnValue(def.multiply(Math.pow(MekanismConfig.general.maxUpgradeMultiplier.get(), UpgradeEffect.itemEnergyFraction(energyUpgrades))));
     }
 }

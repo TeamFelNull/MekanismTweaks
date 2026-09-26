@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[2,)"
+loaderVersion = "[47,)"
 license = "Unlicense"
 
 [[mods]]
@@ -9,30 +9,27 @@ displayName = "MekanismTweaks"
 authors = "nin8995"
 description = '''
 Higher Consumption, Higher Performance.
-Raises the maximum number of Speed, Energy and Chemical Upgrades, keeps the effect per 8 upgrades,
+Raises the maximum number of Speed, Energy and Gas Upgrades, keeps the effect per 8 upgrades,
 and lets the effect of surplus Energy Upgrades decay against the Speed Upgrades.
 '''
 
-[[mixins]]
-config = "mekanismtweaks.mixins.json"
-
 [[dependencies.mekanismtweaks]]
-modId = "neoforge"
-type = "required"
-versionRange = "[20.4,)"
+modId = "forge"
+mandatory = true
+versionRange = "[47,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.mekanismtweaks]]
 modId = "minecraft"
-type = "required"
-versionRange = "[1.20.4]"
+mandatory = true
+versionRange = "[1.20.1]"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.mekanismtweaks]]
 modId = "mekanism"
-type = "required"
-versionRange = "[10.5,10.6)"
+mandatory = true
+versionRange = "[10.4,10.5)"
 ordering = "AFTER"
 side = "BOTH"

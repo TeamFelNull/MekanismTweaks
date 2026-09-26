@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-@Mixin(WarningTracker.class)
+@Mixin(value = WarningTracker.class, remap = false)
 public abstract class MixinWarningTracker implements IExtraWarnings {
 
     @Unique

@@ -1,7 +1,5 @@
 package dev.felnull.mekanismtweaks.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.felnull.mekanismtweaks.Config;
 import dev.felnull.mekanismtweaks.UpgradeEffect;
 import mekanism.api.Action;
@@ -12,22 +10,28 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(TileEntityElectricPump.class)
+@Mixin(value = TileEntityElectricPump.class, remap = false)
 public abstract class MixinElectricPump {
 
     @Shadow
     @Final
     private static int BASE_TICKS_REQUIRED;
 
+    @Shadow
+    private boolean suck() {
+        return false;
+    }
+
     /**
      * Mekanism's Electric Pump pumps once per tick at the most, however many Speed Upgrades it has.
      * Let it pump more in the same tick, like the other machines do, when the time per operation is below one tick.
      * Every extra operation costs the energy of one tick.
      */
-    @WrapOperation(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityElectricPump;suck()Z"))
-    private boolean mekanismtweaks$suckMore(TileEntityElectricPump pump, Operation<Boolean> original) {
-        boolean sucked = original.call(pump);
+    @Redirect(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityElectricPump;suck()Z"))
+    private boolean mekanismtweaks$suckMore(TileEntityElectricPump pump) {
+        boolean sucked = suck();
         if (!sucked) {
             return false;
         }
@@ -42,7 +46,7 @@ public abstract class MixinElectricPump {
                 break;
             }
             pump.getEnergyContainer().extract(energyPerTick, Action.EXECUTE, AutomationType.INTERNAL);
-            if (!original.call(pump)) {
+            if (!suck()) {
                 break;
             }
         }

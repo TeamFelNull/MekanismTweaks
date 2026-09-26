@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "dev.felnull.mekanismtweaks.mixin",
   "compatibilityLevel": "JAVA_17",
+  "refmap": "mekanismtweaks.refmap.json",
   "mixins": [
     "MixinDigitalMiner",
     "MixinElectricPump",

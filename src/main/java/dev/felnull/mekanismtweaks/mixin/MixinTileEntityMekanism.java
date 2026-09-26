@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.EnumSet;
 import java.util.Set;
 
-@Mixin(TileEntityMekanism.class)
+@Mixin(value = TileEntityMekanism.class, remap = false)
 public abstract class MixinTileEntityMekanism {
 
     /**

@@ -1,7 +1,5 @@
 package dev.felnull.mekanismtweaks.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.felnull.mekanismtweaks.Config;
 import dev.felnull.mekanismtweaks.UpgradeEffect;
 import mekanism.api.Action;
@@ -9,19 +7,25 @@ import mekanism.api.AutomationType;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.tile.machine.TileEntityFluidicPlenisher;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(TileEntityFluidicPlenisher.class)
+@Mixin(value = TileEntityFluidicPlenisher.class, remap = false)
 public abstract class MixinFluidicPlenisher {
+
+    @Shadow
+    private void doPlenish() {
+    }
 
     /**
      * Mekanism's Fluidic Plenisher plenishes once per tick at the most, however many Speed Upgrades it has.
      * Let it plenish more in the same tick, like the other machines do, when the time per operation is below one tick.
      * Every extra operation costs the energy of one tick.
      */
-    @WrapOperation(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityFluidicPlenisher;doPlenish()V"))
-    private void mekanismtweaks$plenishMore(TileEntityFluidicPlenisher plenisher, Operation<Void> original) {
-        original.call(plenisher);
+    @Redirect(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityFluidicPlenisher;doPlenish()V"))
+    private void mekanismtweaks$plenishMore(TileEntityFluidicPlenisher plenisher) {
+        doPlenish();
         int operations = Math.min(UpgradeEffect.operationsPerTick(plenisher, TileEntityFluidicPlenisher.BASE_TICKS_REQUIRED), Config.maxPlenisherOperations());
         FloatingLong energyPerTick = plenisher.getEnergyContainer().getEnergyPerTick();
         for (int i = 1; i < operations; i++) {
@@ -33,7 +37,7 @@ public abstract class MixinFluidicPlenisher {
                 break;
             }
             plenisher.getEnergyContainer().extract(energyPerTick, Action.EXECUTE, AutomationType.INTERNAL);
-            original.call(plenisher);
+            doPlenish();
         }
     }
 }

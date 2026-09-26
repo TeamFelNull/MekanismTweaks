@@ -1,15 +1,15 @@
 # MekanismTweaks
 
-**Higher Consumption, Higher Performance** — this branch (`1.20.4`) targets **Minecraft 1.20.4** with **NeoForge** and **Mekanism 10.5.x** (developed and tested with 10.5.20).
+**Higher Consumption, Higher Performance** — this branch (`1.20.1`) targets **Minecraft 1.20.1** with **Forge** and **Mekanism 10.4.x** (developed and tested with 10.4.16).
 
 Mekanism's Speed, Energy and Gas Upgrades are capped at 8 each. This mod lifts that cap, keeps the effect of every 8 upgrades as it is, lets machines do several operations in one tick when they are fast enough, and lets the effect of surplus Energy Upgrades decay against the Speed Upgrades, so more upgrades really mean more performance *and* more consumption.
 
-**No extra library is needed** — NeoForge already ships Mixin. Apart from Mekanism the mod requires nothing.
+**No extra library is needed** — Forge already ships Mixin. Apart from Mekanism the mod requires nothing.
 
 ## Requirements
 
-- Minecraft 1.20.4 with NeoForge 20.4
-- Mekanism 10.5.x for 1.20.4
+- Minecraft 1.20.1 with Forge 47
+- Mekanism 10.4.x for 1.20.1
 
 ## Features
 
@@ -43,14 +43,14 @@ Mekanism's Speed, Energy and Gas Upgrades are capped at 8 each. This mod lifts t
 
 ## Building
 
-Requires JDK 17 (NeoGradle 7 with Gradle 8.7).
+Requires JDK 17 (ForgeGradle 6 with Gradle 8.7).
 
 - `./gradlew build` — the jar is written to `build/libs/`. Mekanism is downloaded from [ModMaven](https://modmaven.dev/) automatically.
 - `./gradlew runClient` / `./gradlew runServer` to try it in a development environment.
 
 ## Other versions
 
-The `1.21.1` branch targets Minecraft 1.21.1 (Mekanism 10.7.x). The `1.7.10-7.1.2` and `1.7.10-9.1.x` branches target Mekanism for Minecraft 1.7.10. The `1.12.2`, `1.16.5`, `1.18.2` and `master` (1.19.2) branches are the older implementations for other Minecraft versions.
+The `1.21.1` branch targets Minecraft 1.21.1 (NeoForge, Mekanism 10.7.x), the `1.20.4` branch Minecraft 1.20.4 (NeoForge, Mekanism 10.5.x). The `1.7.10-7.1.2` and `1.7.10-9.1.x` branches target Mekanism for Minecraft 1.7.10. The `1.12.2`, `1.16.5`, `1.18.2` and `master` (1.19.2) branches are the older implementations for other Minecraft versions.
 
 ## License
 

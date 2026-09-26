@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.IntSupplier;
 
-@Mixin(CachedRecipe.class)
+@Mixin(value = CachedRecipe.class, remap = false)
 public abstract class MixinCachedRecipe {
 
     @Shadow

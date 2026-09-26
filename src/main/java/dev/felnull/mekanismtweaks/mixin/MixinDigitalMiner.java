@@ -1,7 +1,5 @@
 package dev.felnull.mekanismtweaks.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.felnull.mekanismtweaks.Config;
 import dev.felnull.mekanismtweaks.UpgradeEffect;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -18,11 +16,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.BitSet;
 
-@Mixin(TileEntityDigitalMiner.class)
+@Mixin(value = TileEntityDigitalMiner.class, remap = false)
 public abstract class MixinDigitalMiner {
 
     @Shadow
@@ -44,7 +43,7 @@ public abstract class MixinDigitalMiner {
      * Every extra block costs the energy of one tick.
      */
     @Inject(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityDigitalMiner;tryMineBlock()V", shift = At.Shift.AFTER))
-    private void mekanismtweaks$mineMore(CallbackInfoReturnable<Boolean> cir) {
+    private void mekanismtweaks$mineMore(CallbackInfo ci) {
         TileEntityDigitalMiner miner = (TileEntityDigitalMiner) (Object) this;
         int operations = Math.min(UpgradeEffect.operationsPerTick(miner, MekanismConfig.general.minerTicksPerMine.get()), Config.maxMinerOperations());
         if (operations <= 1) {
@@ -66,11 +65,11 @@ public abstract class MixinDigitalMiner {
     /**
      * The block break effect of the Digital Miner makes no sound when it is fully muffled.
      */
-    @WrapOperation(method = "tryMineBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;levelEvent(ILnet/minecraft/core/BlockPos;I)V"))
-    private void mekanismtweaks$muffleBreakEffect(Level level, int type, BlockPos pos, int data, Operation<Void> original) {
+    @Redirect(method = "tryMineBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;levelEvent(ILnet/minecraft/core/BlockPos;I)V", remap = true))
+    private void mekanismtweaks$muffleBreakEffect(Level level, int type, BlockPos pos, int data) {
         TileEntityDigitalMiner miner = (TileEntityDigitalMiner) (Object) this;
         if (miner.getComponent().getUpgrades(Upgrade.MUFFLING) < Upgrade.MUFFLING.getMax()) {
-            original.call(level, type, pos, data);
+            level.levelEvent(type, pos, data);
         }
     }
 }
