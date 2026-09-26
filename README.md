@@ -1,13 +1,13 @@
 # MekanismTweaks
 
-**Higher Consumption, Higher Performance** — this branch (`1.7.10`) targets **Minecraft 1.7.10** and **Mekanism 7.1.2**.
+**Higher Consumption, Higher Performance** — this branch (`1.7.10-7.1.2`) targets **Minecraft 1.7.10** and **Mekanism 7.1.2 only**. Other Mekanism versions for 1.7.10 (such as 9.1.0) are not supported and are refused at startup.
 
 Mekanism's Speed and Energy Upgrades are capped at 8 each. This mod lifts that cap, lets machines run faster than one operation per tick, and makes the energy cost grow with the speed, so more upgrades really mean more performance *and* more consumption.
 
 ## Requirements
 
 - Minecraft 1.7.10 with Forge 10.13.4.1614
-- [Mekanism 7.1.2](https://github.com/mekanism/Mekanism/releases/tag/v7.1.2) for 1.7.10 (and its own dependencies, e.g. ForgeMultipart)
+- [Mekanism 7.1.2](https://github.com/mekanism/Mekanism/releases/tag/v7.1.2) for 1.7.10 (and its own dependencies, e.g. ForgeMultipart). **Not** Mekanism 9.x.
 - [UniMixins](https://github.com/LegacyModdingMC/UniMixins) (or GTNHMixins / SpongeMixins)
 
 ## Features
