@@ -6,6 +6,7 @@ import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.tile.machine.TileEntityElectricPump;
+import net.minecraftforge.fluids.FluidAttributes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -39,7 +40,7 @@ public abstract class MixinElectricPump {
         FloatingLong energyPerTick = pump.getEnergyContainer().getEnergyPerTick();
         for (int i = 1; i < operations; i++) {
             // the tank must have room for another operation, and there must be energy for it
-            if (!pump.fluidTank.isEmpty() && pump.estimateIncrementAmount() > pump.fluidTank.getNeeded()) {
+            if (!pump.fluidTank.isEmpty() && FluidAttributes.BUCKET_VOLUME > pump.fluidTank.getNeeded()) {
                 break;
             }
             if (!pump.getEnergyContainer().extract(energyPerTick, Action.SIMULATE, AutomationType.INTERNAL).equals(energyPerTick)) {

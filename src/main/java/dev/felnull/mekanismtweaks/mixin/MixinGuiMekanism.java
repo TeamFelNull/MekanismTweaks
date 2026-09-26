@@ -7,7 +7,7 @@ import mekanism.client.gui.GuiMekanismTile;
 import mekanism.common.inventory.warning.IWarningTracker;
 import mekanism.common.inventory.warning.WarningTracker;
 import mekanism.common.tile.base.TileEntityMekanism;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -39,7 +39,7 @@ public abstract class MixinGuiMekanism {
             warningTracker = new WarningTracker();
         }
         if (warningTracker instanceof IExtraWarnings extra) {
-            extra.mekanismtweaks$addExtra(() -> UpgradeEffect.needsEnergyUpgrades(tile), Component.literal("Insert Energy Upgrades!"));
+            extra.mekanismtweaks$addExtra(() -> UpgradeEffect.needsEnergyUpgrades(tile), new TextComponent("Insert Energy Upgrades!"));
         }
     }
 }
