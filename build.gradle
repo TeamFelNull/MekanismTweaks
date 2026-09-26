@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         maven {
             name "forge"
             url "https://files.minecraftforge.net/maven"
@@ -22,12 +22,13 @@ group = mod_group
 archivesBaseName = "$mod_id-$minecraft_version"
 
 sourceCompatibility = targetCompatibility = '1.8'
+tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
 compileJava {
     sourceCompatibility = targetCompatibility = '1.8'
 }
 
 minecraft {
-    version "1.12.2-14.23.5.2847"
+    version "${minecraft_version}-${forge_version}"
     runDir = "run"
     mappings = mappings_version
 }
@@ -64,8 +65,8 @@ dependencies {
         exclude module: 'gson'
     }
 
-    compile 'curse.maven:Mekanism-268560:2835175'
-    runtime 'mezz.jei:jei_1.12.2:4.16.1.302'
+    compile "curse.maven:Mekanism-268560:${mekanism_file}"
+    compileOnly files('libs/compile-api-stubs.jar')
 }
 
 processResources {
@@ -97,3 +98,7 @@ jar {
         )
     }
 }
+
+// ForgeGradle 2 puts every jar of libs/ on the classpath. The Mekanism jars there belong to the 1.7.10 branches and must not be used here.
+sourceSets.main.compileClasspath = sourceSets.main.compileClasspath.filter { !(it.parentFile != null && it.parentFile.name == 'libs' && it.name.startsWith('Mekanism')) }
+sourceSets.main.runtimeClasspath = sourceSets.main.runtimeClasspath.filter { !(it.parentFile != null && it.parentFile.name == 'libs' && it.name.startsWith('Mekanism')) }

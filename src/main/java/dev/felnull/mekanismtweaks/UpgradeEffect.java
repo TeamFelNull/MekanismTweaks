@@ -72,7 +72,7 @@ public class UpgradeEffect {
      * Convert the UpgradesInstalled fraction into an effect value.
      */
     public static double effect(double fraction) {
-        return Math.pow(MekanismConfig.current().general.maxUpgradeMultiplier.val(), fraction);
+        return Math.pow(MekanismConfig.general.maxUpgradeMultiplier, fraction);
     }
 
     /**

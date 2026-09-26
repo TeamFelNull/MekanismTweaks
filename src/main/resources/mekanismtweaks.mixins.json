@@ -21,7 +21,6 @@
     "machine.operational.ChanceMachine",
     "machine.operational.ChemicalCrystallizer",
     "machine.operational.ChemicalOxidizer",
-    "machine.operational.DoubleElectricMachine",
     "machine.operational.ElectricMachine",
     "machine.operational.MetallurgicInfuser",
     "machine.operational.OperationalMachine",
