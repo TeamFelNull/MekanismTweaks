@@ -9,7 +9,7 @@ buildscript {
         maven { url = "https://repo.spongepowered.org/maven" }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
         classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
     }
 }
@@ -67,6 +67,7 @@ dependencies {
 
     compile "curse.maven:Mekanism-268560:${mekanism_file}"
     compileOnly files('libs/compile-api-stubs.jar')
+    runtime "curse.maven:MCMultiPart-239431:2381408"
 }
 
 processResources {
