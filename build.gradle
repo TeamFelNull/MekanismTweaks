@@ -25,7 +25,7 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200723-1.16.1'
+    mappings channel: 'snapshot', version: '20200514-1.15.1'
 
     runs {
         configureEach {
@@ -54,18 +54,18 @@ mixin {
 repositories {
     mavenCentral()
     maven {
-        name = 'ModMaven'
-        url = 'https://modmaven.dev/'
+        name = 'CurseMaven'
+        url = 'https://cursemaven.com/'
         content {
-            includeGroup 'mekanism'
+            includeGroup 'curse.maven'
         }
     }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    // Mekanism 10.4.x for 1.20.1: the "all" jar holds mekanism.api (Upgrade, ...) and the rest
-    implementation fg.deobf("mekanism:Mekanism:${mekanism_version}:all")
+    // Mekanism 9.10.x for 1.15.2 from CurseMaven (Mekanism-1.15.2-9.10.9.422.jar, file 2996531)
+    implementation fg.deobf("${mekanism_version}")
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 

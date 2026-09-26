@@ -4,7 +4,7 @@ import dev.felnull.mekanismtweaks.Config;
 import dev.felnull.mekanismtweaks.UpgradeEffect;
 import mekanism.api.Upgrade;
 import mekanism.common.config.MekanismConfig;
-import mekanism.common.tile.machine.TileEntityDigitalMiner;
+import mekanism.common.tile.TileEntityDigitalMiner;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,7 +36,7 @@ public abstract class MixinDigitalMiner {
     /**
      * The Digital Miner adds the drops of every block it mines.
      */
-    @Inject(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityDigitalMiner;add(Ljava/util/List;)V"))
+    @Inject(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityDigitalMiner;add(Ljava/util/List;)V"))
     private void mekanismtweaks$confirmMined(CallbackInfo ci) {
         mekanismtweaks$mined = true;
     }

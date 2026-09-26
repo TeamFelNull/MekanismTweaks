@@ -1,6 +1,6 @@
 # MekanismTweaks
 
-**Higher Consumption, Higher Performance** — this branch (`1.16.1`) targets **Minecraft 1.16.1** with **Forge** and **Mekanism 10.0.x** (developed with 10.0.9).
+**Higher Consumption, Higher Performance** — this branch (`1.15.2`) targets **Minecraft 1.15.2** with **Forge** and **Mekanism 9.10.x** (developed and tested with 9.10.9).
 
 Mekanism's Speed, Energy and Gas Upgrades are capped at 8 each. This mod lifts that cap, keeps the effect of every 8 upgrades as it is, lets machines do several operations in one tick when they are fast enough, and lets the effect of surplus Energy Upgrades decay against the Speed Upgrades, so more upgrades really mean more performance *and* more consumption.
 
@@ -8,8 +8,8 @@ Mekanism's Speed, Energy and Gas Upgrades are capped at 8 each. This mod lifts t
 
 ## Requirements
 
-- Minecraft 1.16.1 with Forge 32
-- Mekanism 10.0.x for 1.16.1
+- Minecraft 1.15.2 with Forge 31
+- Mekanism 9.10.x for 1.15.2
 
 ## Features
 
@@ -46,7 +46,7 @@ Mekanism's Speed, Energy and Gas Upgrades are capped at 8 each. This mod lifts t
 
 Requires JDK 8 (the game and the compiler) and JDK 17 to run Gradle (ForgeGradle 5.1 with Gradle 7.6).
 
-- `./gradlew build` — the jar is written to `build/libs/`. Mekanism is downloaded from [ModMaven](https://modmaven.dev/) automatically.
+- `./gradlew build` — the jar is written to `build/libs/`. Mekanism 9.10.9 is downloaded from CurseMaven (CurseForge file 2996531) automatically.
 - `./gradlew runClient` / `./gradlew runServer` to try it in a development environment.
 
 ## Other versions

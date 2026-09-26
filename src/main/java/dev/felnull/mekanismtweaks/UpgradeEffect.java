@@ -2,7 +2,7 @@ package dev.felnull.mekanismtweaks;
 
 import mekanism.api.Upgrade;
 import mekanism.common.config.MekanismConfig;
-import mekanism.common.tile.interfaces.IUpgradeTile;
+import mekanism.common.base.IUpgradeTile;
 
 public class UpgradeEffect {
 

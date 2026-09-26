@@ -5,7 +5,8 @@ import dev.felnull.mekanismtweaks.UpgradeEffect;
 import mekanism.api.Action;
 import mekanism.api.inventory.AutomationType;
 import mekanism.api.math.FloatingLong;
-import mekanism.common.tile.machine.TileEntityFormulaicAssemblicator;
+import mekanism.common.tile.TileEntityFormulaicAssemblicator;
+import mekanism.common.capabilities.energy.MachineEnergyContainer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,8 +17,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinFormulaicAssemblicator {
 
     @Shadow
-    @Final
-    private static int BASE_TICKS_REQUIRED;
+    private MachineEnergyContainer<TileEntityFormulaicAssemblicator> energyContainer;
+
 
     @Shadow
     private boolean doSingleCraft() {
@@ -29,19 +30,19 @@ public abstract class MixinFormulaicAssemblicator {
      * Let it craft more in the same tick, like the other machines do, when the time per craft is below one tick.
      * Every extra craft costs the energy of one tick.
      */
-    @Redirect(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/machine/TileEntityFormulaicAssemblicator;doSingleCraft()Z"))
+    @Redirect(method = "onUpdateServer", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityFormulaicAssemblicator;doSingleCraft()Z"))
     private boolean mekanismtweaks$craftMore(TileEntityFormulaicAssemblicator assemblicator) {
         boolean crafted = doSingleCraft();
         if (!crafted) {
             return false;
         }
-        int operations = Math.min(UpgradeEffect.operationsPerTick(assemblicator, BASE_TICKS_REQUIRED), Config.maxAssemblicatorOperations());
-        FloatingLong energyPerTick = assemblicator.getEnergyContainer().getEnergyPerTick();
+        int operations = Math.min(UpgradeEffect.operationsPerTick(assemblicator, assemblicator.BASE_TICKS_REQUIRED), Config.maxAssemblicatorOperations());
+        FloatingLong energyPerTick = energyContainer.getEnergyPerTick();
         for (int i = 1; i < operations; i++) {
-            if (!assemblicator.getEnergyContainer().extract(energyPerTick, Action.SIMULATE, AutomationType.INTERNAL).equals(energyPerTick)) {
+            if (!energyContainer.extract(energyPerTick, Action.SIMULATE, AutomationType.INTERNAL).equals(energyPerTick)) {
                 break;
             }
-            assemblicator.getEnergyContainer().extract(energyPerTick, Action.EXECUTE, AutomationType.INTERNAL);
+            energyContainer.extract(energyPerTick, Action.EXECUTE, AutomationType.INTERNAL);
             if (!doSingleCraft()) {
                 break;
             }

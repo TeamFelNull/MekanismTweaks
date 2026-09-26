@@ -3,7 +3,7 @@ package dev.felnull.mekanismtweaks.mixin;
 import dev.felnull.mekanismtweaks.UpgradeEffect;
 import mekanism.api.Upgrade;
 import mekanism.common.MekanismLang;
-import mekanism.common.tile.interfaces.IUpgradeTile;
+import mekanism.common.base.IUpgradeTile;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.UpgradeUtils;
 import net.minecraft.util.text.ITextComponent;
