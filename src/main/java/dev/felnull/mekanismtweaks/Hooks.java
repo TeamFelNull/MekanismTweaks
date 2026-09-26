@@ -14,6 +14,7 @@ import mekanism.common.tile.TileEntityChemicalOxidizer;
 import mekanism.common.tile.TileEntityContainerBlock;
 import mekanism.common.tile.TileEntityDigitalMiner;
 import mekanism.common.tile.TileEntityElectricBlock;
+import mekanism.common.tile.TileEntityElectricPump;
 import mekanism.common.tile.TileEntityMetallurgicInfuser;
 import mekanism.common.tile.component.TileComponentUpgrade;
 import mekanism.common.util.LangUtils;
@@ -193,6 +194,17 @@ public class Hooks {
     }
 
     /**
+     * Stands in for the pump's calls of suck in its update. The pump has performed an operation only if it has really pumped.
+     */
+    public static boolean suck(TileEntityElectricPump pump, boolean take) {
+        boolean sucked = pump.suck(take);
+        if (take && sucked) {
+            hasOperated.set(true);
+        }
+        return sucked;
+    }
+
+    /**
      * Avoid consuming energy and gas while performing excess operations.
      */
     public static double guard(double value) {
@@ -223,7 +235,8 @@ public class Hooks {
         int acc = (stored == null ? 0 : stored) - reqTime;
         isInjecting.set(true);
         try {
-            int maxExtra = machine instanceof TileEntityDigitalMiner ? MekanismTweaks.maxMinerOperations : Integer.MAX_VALUE;
+            int maxExtra = machine instanceof TileEntityDigitalMiner ? MekanismTweaks.maxMinerOperations :
+                    machine instanceof TileEntityElectricPump ? MekanismTweaks.maxPumpOperations : Integer.MAX_VALUE;
             for (int extra = 0; acc >= 20 && extra < maxExtra; extra++) {
                 acc -= 20;
                 ((IRerun) machine).mt$rerun();
@@ -290,6 +303,7 @@ public class Hooks {
     }
 
     private static int ticksRequired(Object machine) {
+        if (machine instanceof TileEntityElectricPump) return ((TileEntityElectricPump) machine).ticksRequired;
         if (machine instanceof TileEntityDigitalMiner) {
             TileEntityDigitalMiner miner = (TileEntityDigitalMiner) machine;
             return UpgradeEffect.speed(miner, miner.BASE_DELAY);

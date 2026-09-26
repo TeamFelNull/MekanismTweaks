@@ -51,7 +51,8 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
             "mekanism.common.tile.TileEntityChemicalCrystallizer",
             "mekanism.common.tile.TileEntityChemicalOxidizer",
             "mekanism.common.tile.TileEntityChemicalDissolutionChamber",
-            "mekanism.common.tile.TileEntityDigitalMiner"));
+            "mekanism.common.tile.TileEntityDigitalMiner",
+            "mekanism.common.tile.TileEntityElectricPump"));
 
     /**
      * The classes that have their own recalculateUpgradables.
@@ -62,7 +63,8 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
             "mekanism.common.tile.TileEntityMetallurgicInfuser",
             "mekanism.common.tile.TileEntityChemicalCrystallizer",
             "mekanism.common.tile.TileEntityChemicalOxidizer",
-            "mekanism.common.tile.TileEntityChemicalDissolutionChamber"));
+            "mekanism.common.tile.TileEntityChemicalDissolutionChamber",
+            "mekanism.common.tile.TileEntityElectricPump"));
 
     /**
      * The classes that have their own getScaledProgress.
@@ -267,6 +269,11 @@ public class MekanismTweaksTransformer implements IClassTransformer, Opcodes {
                     } else if (insn instanceof MethodInsnNode && ((MethodInsnNode) insn).name.equals("getDelay") && ((MethodInsnNode) insn).desc.equals("()I")) {
                         // the Digital Miner (it has no operate method): the delay is only set after it has mined a block
                         method.instructions.insertBefore(insn, new MethodInsnNode(INVOKESTATIC, HOOKS, "operated", "()V", false));
+                    } else if (insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode) insn).name.equals("suck")
+                            && ((MethodInsnNode) insn).desc.equals("(Z)Z") && ((MethodInsnNode) insn).owner.equals(node.name)) {
+                        // the Electric Pump: it has operated only if suck(true) has really pumped
+                        method.instructions.set(insn, new MethodInsnNode(INVOKESTATIC, HOOKS, "suck",
+                                "(Lmekanism/common/tile/TileEntityElectricPump;Z)Z", false));
                     } else if (insn.getOpcode() == RETURN) {
                         InsnList list = new InsnList();
                         list.add(new VarInsnNode(ALOAD, 0));
