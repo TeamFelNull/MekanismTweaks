@@ -9,6 +9,7 @@
     "MixinCachedRecipe",
     "MixinFluidicPlenisher",
     "MixinProgressMachine",
+    "MixinFactory",
     "MixinFormulaicAssemblicator",
     "MixinTileEntityMekanism",
     "MixinMekanismUtils",
