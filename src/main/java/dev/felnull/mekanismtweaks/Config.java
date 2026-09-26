@@ -39,6 +39,18 @@ public class Config {
     private static final ModConfigSpec.DoubleValue SUST_CHEMICAL = BUILDER
             .comment("Same as sustEnergy, for the Chemical Upgrades.")
             .defineInRange("sustChemical", DEFAULT_SUST, 0, 1);
+    private static final ModConfigSpec.IntValue MAX_PUMP_OPERATIONS = BUILDER
+            .comment("The most times an Electric Pump pumps in one tick, when its Speed Upgrades make it faster than one operation per tick.",
+                    "Every extra operation costs the energy of one tick. 1 turns this off, as per vanilla Mekanism.")
+            .defineInRange("maxPumpOperations", DEFAULT_MAX, 1, Integer.MAX_VALUE);
+    private static final ModConfigSpec.IntValue MAX_PLENISHER_OPERATIONS = BUILDER
+            .comment("The most times a Fluidic Plenisher plenishes in one tick, when its Speed Upgrades make it faster than one operation per tick.",
+                    "Every extra operation costs the energy of one tick. 1 turns this off, as per vanilla Mekanism.")
+            .defineInRange("maxPlenisherOperations", DEFAULT_MAX, 1, Integer.MAX_VALUE);
+    private static final ModConfigSpec.IntValue MAX_ASSEMBLICATOR_OPERATIONS = BUILDER
+            .comment("The most crafts a Formulaic Assemblicator does in one tick, when its Speed Upgrades make it faster than one craft per tick.",
+                    "Every extra craft costs the energy of one tick. 1 turns this off, as per vanilla Mekanism.")
+            .defineInRange("maxAssemblicatorOperations", DEFAULT_MAX, 1, Integer.MAX_VALUE);
     private static final ModConfigSpec.IntValue MAX_MINER_OPERATIONS = BUILDER
             .comment("The most blocks a Digital Miner mines in one tick, when its Speed Upgrades make it faster than one block per tick.",
                     "Every block costs the energy of one tick. 1 turns this off, as per vanilla Mekanism.")
@@ -64,6 +76,18 @@ public class Config {
 
     public static int freeChemical() {
         return get(FREE_CHEMICAL, DEFAULT_FREE);
+    }
+
+    public static int maxPumpOperations() {
+        return get(MAX_PUMP_OPERATIONS, DEFAULT_MAX);
+    }
+
+    public static int maxPlenisherOperations() {
+        return get(MAX_PLENISHER_OPERATIONS, DEFAULT_MAX);
+    }
+
+    public static int maxAssemblicatorOperations() {
+        return get(MAX_ASSEMBLICATOR_OPERATIONS, DEFAULT_MAX);
     }
 
     public static int maxMinerOperations() {

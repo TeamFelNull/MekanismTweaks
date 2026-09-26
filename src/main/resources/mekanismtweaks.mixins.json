@@ -5,6 +5,10 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "MixinDigitalMiner",
+    "MixinElectricPump",
+    "MixinFluidicPlenisher",
+    "MixinFormulaicAssemblicator",
+    "MixinTileEntityMekanism",
     "MixinMekanismUtils",
     "MixinUpgrade",
     "MixinUpgradeUtils"

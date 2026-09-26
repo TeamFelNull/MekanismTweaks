@@ -1,13 +1,18 @@
 package dev.felnull.mekanismtweaks.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.felnull.mekanismtweaks.Config;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
+import mekanism.api.Upgrade;
 import mekanism.common.capabilities.energy.MinerEnergyContainer;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.tile.machine.TileEntityDigitalMiner;
 import mekanism.common.util.MekanismUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -54,6 +59,17 @@ public abstract class MixinDigitalMiner {
             }
             energyContainer.extract(energyPerTick, Action.EXECUTE, AutomationType.INTERNAL);
             tryMineBlock();
+        }
+    }
+
+    /**
+     * The block break effect of the Digital Miner makes no sound when it is fully muffled.
+     */
+    @WrapOperation(method = "tryMineBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;levelEvent(ILnet/minecraft/core/BlockPos;I)V"))
+    private void mekanismtweaks$muffleBreakEffect(Level level, int type, BlockPos pos, int data, Operation<Void> original) {
+        TileEntityDigitalMiner miner = (TileEntityDigitalMiner) (Object) this;
+        if (miner.getComponent().getUpgrades(Upgrade.MUFFLING) < Upgrade.MUFFLING.getMax()) {
+            original.call(level, type, pos, data);
         }
     }
 }
