@@ -16,6 +16,7 @@ Mekanism's Speed, Energy and Chemical Upgrades are capped at 8 each. This mod li
 - **Configurable upgrade limits.** The maximum number of Speed, Energy and Chemical Upgrades a machine can hold is set in the config (64 each by default).
 - **Same effect per 8 upgrades.** Mekanism divides the number of upgrades by the maximum to get the effect, so raising the maximum alone would weaken every upgrade. This mod keeps 8 upgrades as one unit of effect (the base is Mekanism's own `UpgradeModifier`). Mekanism itself then takes care of the rest: installing the whole stack in the upgrade slot at once, and performing several operations in one tick when a machine is faster than one tick.
 - **Energy Upgrades and the energy cost.** The energy needed per tick grows with the Speed Upgrades. Energy Upgrades save energy and enlarge the energy buffer, but only up to the Speed Upgrades (at least `freeEnergy`): the effect of Energy Upgrades beyond that decays (see `sustEnergy`). Chemical Upgrades work the same way for the chemical consumption.
+- **Digital Miner.** Mekanism's Digital Miner mines one block per tick at the most, however many Speed Upgrades it has. When the time per block drops below one tick, it now mines several blocks in the same tick, up to `maxMinerOperations`. Every extra block costs the energy of one tick.
 - **Effect display.** The upgrade screen shows the effect that is really applied, in exponential notation.
 - **Warning.** When a machine has more than 10 more Speed Upgrades than Energy Upgrades, the yellow warning tab of its GUI shows *Insert Energy Upgrades!* Without enough Energy Upgrades the energy needed per tick can exceed what the machine can store, and it stops working.
 
@@ -32,6 +33,7 @@ Mekanism's Speed, Energy and Chemical Upgrades are capped at 8 each. This mod li
 | `freeChemical` | 8 | Minimum number of Chemical Upgrades whose effect never decays. |
 | `sustEnergy` | 0.5 | How much of the effect of the Energy Upgrades beyond the Speed Upgrades is sustained. At 1 nothing decays (as in vanilla Mekanism); at 0 the surplus has no effect. At 0.5, overcoming the Speed Upgrades needs Energy Upgrades of at least their square. |
 | `sustChemical` | 0.5 | Same as `sustEnergy`, for the Chemical Upgrades. |
+| `maxMinerOperations` | 64 | The most blocks a Digital Miner mines in one tick. `1` turns this off, as per vanilla Mekanism. |
 
 ## Building
 

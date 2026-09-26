@@ -4,6 +4,7 @@
   "package": "dev.felnull.mekanismtweaks.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "MixinDigitalMiner",
     "MixinMekanismUtils",
     "MixinUpgrade",
     "MixinUpgradeUtils"

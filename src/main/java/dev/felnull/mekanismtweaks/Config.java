@@ -39,6 +39,10 @@ public class Config {
     private static final ModConfigSpec.DoubleValue SUST_CHEMICAL = BUILDER
             .comment("Same as sustEnergy, for the Chemical Upgrades.")
             .defineInRange("sustChemical", DEFAULT_SUST, 0, 1);
+    private static final ModConfigSpec.IntValue MAX_MINER_OPERATIONS = BUILDER
+            .comment("The most blocks a Digital Miner mines in one tick, when its Speed Upgrades make it faster than one block per tick.",
+                    "Every block costs the energy of one tick. 1 turns this off, as per vanilla Mekanism.")
+            .defineInRange("maxMinerOperations", DEFAULT_MAX, 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec SPEC = BUILDER.build();
 
@@ -60,6 +64,10 @@ public class Config {
 
     public static int freeChemical() {
         return get(FREE_CHEMICAL, DEFAULT_FREE);
+    }
+
+    public static int maxMinerOperations() {
+        return get(MAX_MINER_OPERATIONS, DEFAULT_MAX);
     }
 
     public static double sustEnergy() {
