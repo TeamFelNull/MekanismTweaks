@@ -45,14 +45,31 @@ The effect per 8 upgrades is Mekanism's own `UpgradeModifier` (`mekanism.cfg`).
 
 ### Speed formula
 
-Let `s` be the number of installed Speed Upgrades divided by 8, `d` the machine's base ticks per operation, and `M` Mekanism's `maxUpgradeMultiplier`. With `T = d / M^s`, the required ticks are:
+Let `x` be the number of installed Speed Upgrades, `d` the machine's base ticks per operation, and `M` Mekanism's `maxUpgradeMultiplier`. With `T = d / M^(x/8)`, the required ticks are:
 
 ```text
 T > 2:   floor(T)
-T <= 2:  -ceil(20 * (2^max(log_M(d / 2) + 1 - s, 0) / T - 1))
+T <= 2:  -ceil(20 * (2^max(log_M(d / 2) + 1 - x/8, 0) / T - 1))
 ```
 
 A negative result represents excess progress, with 20 progress per additional operation. [Explore the speed curve in Desmos](https://www.desmos.com/calculator/fk7mk2t9hq?lang=ja).
+
+### Energy Upgrade effect
+
+Let `m` be the installed Speed Upgrade count, `x` the installed count of the upgrade whose effect is being calculated (`ENERGY` or `GAS`), `f = freeEnergy` or `freeGas`, `s = sustEnergy` or `sustGas`, and `M` Mekanism's `maxUpgradeMultiplier`. Upgrades above `n` have a reduced effect:
+
+```text
+n = max(m, f)
+sustainRate = 0                                  if s = 0
+              1 / max(1, n^(log_2(1/s)) - 1)     if s > 0
+decayedFraction = (x <= n ? x : n + (x - n) * sustainRate) / 8
+
+energy per tick = base energy per tick * M^(2m/8 - decayedFraction)
+energy buffer   = base buffer * M^decayedFraction  if avoidExcessiveEnergyBuffer
+                  base buffer * M^(x/8)            otherwise
+```
+
+Thus Energy Upgrades up to `max(m, f)` retain their full effect; each additional upgrade contributes only `sustainRate` of an upgrade. The same decay calculation applies to Gas Upgrades using `freeGas` and `sustGas`. [Explore the decay curve in Desmos](https://www.desmos.com/calculator/bc5e1bd598?lang=ja).
 
 ## Building
 
@@ -69,10 +86,6 @@ Set JDK 21 as `JAVA_HOME` or as IntelliJ's Gradle JVM. Do not add a machine-spec
 ## Other versions
 
 Every Minecraft version has its own branch, named after the Minecraft version: `1.21.1`, `1.20.4`, `1.20.1`, `1.19.2`, `1.19.1`, `1.16.4`, `1.16.3`, `1.16.1`, `1.15.2`, `1.12.2`, `1.12.1`, `1.12` (Mekanism 9.4 - 9.8), `1.11.2` and `1.10.2` (Mekanism 9.x). The `1.7.10-7.1.2` and `1.7.10-9.1.x` branches target Mekanism 7.1.2 and 9.1.x for Minecraft 1.7.10. The `1.16.5`, `1.18.2` and `master` branches keep the older implementations.
-
-## Credits
-
-Based on the original MekanismTweaks for 1.12.2 by nin8995.
 
 ## License
 

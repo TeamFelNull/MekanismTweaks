@@ -144,18 +144,23 @@ idea {
         settings {
             runConfigurations {
                 '0. Setup Decomp Workspace'(Gradle) {
+                    projectPath = rootProject.projectDir.absolutePath
                     taskNames = ['setupDecompWorkspace']
                 }
                 '1. Run Client'(Gradle) {
+                    projectPath = rootProject.projectDir.absolutePath
                     taskNames = ['runClient']
                 }
                 '2. Run Server'(Gradle) {
+                    projectPath = rootProject.projectDir.absolutePath
                     taskNames = ['runServer']
                 }
                 '3. Run Obfuscated Client'(Gradle) {
+                    projectPath = rootProject.projectDir.absolutePath
                     taskNames = ['runObfClient']
                 }
                 '4. Run Obfuscated Server'(Gradle) {
+                    projectPath = rootProject.projectDir.absolutePath
                     taskNames = ['runObfServer']
                 }
             }
