@@ -20,7 +20,7 @@ public abstract class ElectricPump implements IOperationData {
     @Inject(method = "onUpdate", at = @At(value = "TAIL"))
     public void handleExcessOperations(CallbackInfo ci) {
         Temp.hasOperated.set(suckedLastOperation);
-        Temp.inject2(this, this::onUpdate);
+        Temp.injectProgress(this, this::onUpdate);
     }
 
     @Redirect(method = "onUpdate", at = @At(value = "FIELD", target = "Lmekanism/common/tile/TileEntityElectricPump;operatingTicks:I", opcode = Opcodes.PUTFIELD, ordinal = 1))

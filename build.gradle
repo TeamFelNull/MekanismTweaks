@@ -16,10 +16,14 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'eclipse'
+apply plugin: 'idea'
 
 version = mod_version
 group = mod_group
 archivesBaseName = "$mod_id-$minecraft_version"
+
+def mekanismSourcesCommit = '321afd497c19e0051143035cfdc7de999aef8c3d'
+def mekanismSourcesArchive = file("${gradle.gradleUserHomeDir}/caches/mekanism-sources/Mekanism-${mekanism_version}-${mekanismSourcesCommit}.zip")
 
 sourceCompatibility = targetCompatibility = '1.8'
 tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
@@ -31,6 +35,12 @@ minecraft {
     version "1.12.2-14.23.5.2847"
     runDir = "run"
     mappings = mappings_version
+}
+
+tasks.withType(JavaExec) {
+    if (name == 'runClient' || name == 'runServer') {
+        jvmArgs '-Dfml.coreMods.load=dev.felnull.mekanismtweaks.MekanismTweaks'
+    }
 }
 
 repositories {
@@ -65,10 +75,48 @@ dependencies {
         exclude module: 'gson'
     }
 
-    compile 'curse.maven:Mekanism-268560:2835175'
+    deobfCompile 'curse.maven:Mekanism-268560:2835175'
     compileOnly files('libs/compile-api-stubs.jar')
     runtime 'mezz.jei:jei_1.12.2:4.16.1.302'
 }
+
+task prepareMekanismSources {
+    description = 'Downloads the matching Mekanism sources for IntelliJ library search/navigation.'
+    group = 'IDE'
+    outputs.file mekanismSourcesArchive
+
+    doLast {
+        if (!mekanismSourcesArchive.exists()) {
+            mekanismSourcesArchive.parentFile.mkdirs()
+            ant.get(
+                    src: "https://github.com/mekanism/Mekanism/archive/${mekanismSourcesCommit}.zip",
+                    dest: mekanismSourcesArchive,
+                    usetimestamp: true)
+        }
+    }
+}
+
+idea {
+    module {
+        downloadSources = true
+        iml {
+            withXml {
+                def sourceUrl = "jar://${mekanismSourcesArchive.absolutePath.replace('\\', '/')}!/Mekanism-${mekanismSourcesCommit}/src/main/java"
+                def libraries = it.asNode().component.orderEntry.library
+                def mekanismLibrary = libraries.find { library ->
+                    library.CLASSES.root.any { root -> root.@url.toString().contains('Mekanism-268560-2835175.jar') }
+                }
+
+                if (mekanismLibrary) {
+                    mekanismLibrary.SOURCES[0].children().clear()
+                    mekanismLibrary.SOURCES[0].appendNode('root', [url: sourceUrl])
+                }
+            }
+        }
+    }
+}
+
+ideaModule.dependsOn prepareMekanismSources
 
 processResources {
     inputs.property "version", project.version
@@ -92,6 +140,11 @@ mixin {
 }
 
 jar {
+    from {
+        configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+
     manifest {
         attributes(
                 "FMLCorePlugin": mod_core_plugin.replace('${mod_group}', mod_group),
@@ -99,3 +152,4 @@ jar {
         )
     }
 }
+jar.finalizedBy('reobfJar')

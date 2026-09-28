@@ -18,6 +18,11 @@ public abstract class ChemicalDissolutionChamber implements IOperationData {
     @Shadow
     public abstract void onUpdate();
 
+    @Inject(method = "onUpdate", at = @At("TAIL"))
+    public void handleExcessOperations(CallbackInfo ci) {
+        Temp.injectProgress(this, this::onUpdate);
+    }
+
     @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityChemicalDissolutionChamber;operate(Lmekanism/common/recipe/machines/DissolutionRecipe;)V"))
     private void confirmOperated(CallbackInfo ci) {
         Temp.hasOperated.set(true);
@@ -26,11 +31,6 @@ public abstract class ChemicalDissolutionChamber implements IOperationData {
     @Redirect(method = "onUpdate", at = @At(value = "FIELD", target = "Lmekanism/common/tile/TileEntityChemicalDissolutionChamber;operatingTicks:I", opcode = Opcodes.PUTFIELD, ordinal = 1))
     private void modifyOperatingTicksLater(TileEntityChemicalDissolutionChamber instance, int value) {
         Temp.modifyOperatingTicksLater((IOperationData) (Object)instance, value);
-    }
-
-    @Inject(method = "onUpdate", at = @At("TAIL") /*@At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityChemicalDissolutionChamber;canOperate(Lmekanism/common/recipe/machines/DissolutionRecipe;)Z", ordinal = 1, shift = At.Shift.BY, by = -4)*/)
-    public void handleExcessOperations(CallbackInfo ci) {
-        Temp.inject2(this, this::onUpdate);
     }
 
     @Redirect(method = "onUpdate", at = @At(value = "FIELD", target = "Lmekanism/common/tile/TileEntityChemicalDissolutionChamber;energyPerTick:D", opcode = Opcodes.GETFIELD))

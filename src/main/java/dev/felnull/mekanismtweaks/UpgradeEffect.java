@@ -17,12 +17,18 @@ public class UpgradeEffect {
 
     /**
      * Required ticks per operation.
-     * Extend the speed effect of SpeedUpgrade. If performing more than one operation within a single tick, treat the excess progress as negative ticks required. (one excess operation per -20 ticks)
-     * As smoothing the speed, appropriate interpolation has been applied to ensure that the speed does not decrease when updated to 1.2.
+     * Extends the speed effect of Speed Upgrades. When performing multiple operations per tick, excess progress is represented as negative required ticks (-20 per extra operation).
+     * Interpolation smooths speed scaling while minimizing significant performance regressions when updating to v1.2.
+     * @see <a href="https://www.desmos.com/calculator/fk7mk2t9hq?lang=ja">speed upgrade effect (Desmos)</a>
      */
     public static int speed(IUpgradeTile tile, int def) {
-        double ticks = def * effect(-fraction(tile, Upgrade.SPEED));
-        return (int) (ticks > 2 ? ticks : ticks > 1 ? 20 * (ticks - 2) + 1 : -20 / ticks + 1);
+        double speedFraction = fraction(tile, Upgrade.SPEED);
+        double ticks = def * effect(-speedFraction);
+        if (ticks > 2)
+            return (int) Math.floor(ticks);
+
+        double excess = Math.pow(2, Math.max(inverseEffect(def / 2.) + 1 - speedFraction, 0)) / ticks - 1;
+        return (int) -Math.min(Integer.MAX_VALUE / 2, Math.ceil(20 * excess));
     }
 
     /**
@@ -39,7 +45,7 @@ public class UpgradeEffect {
      * If necessary, the energy-buffer increment of excess EnergyUpgrades decays based on the SpeedUpgradesInstalled.
      */
     public static double energyBuffer(IUpgradeTile tile, double def) {
-        return def * effect(MekanismTweaks.energyBuffer ? decayed(tile, Upgrade.ENERGY) : fraction(tile, Upgrade.ENERGY));
+        return def * effect(MekanismTweaks.avoidExcessiveEnergyBuffer ? decayed(tile, Upgrade.ENERGY) : fraction(tile, Upgrade.ENERGY));
     }
 
     /**
@@ -55,6 +61,7 @@ public class UpgradeEffect {
 
     /**
      * Decayed UpgradesInstalled fraction.
+     * @see <a href="https://www.desmos.com/calculator/bc5e1bd598?lang=ja">saving effect (Desmos)</a>
      */
     public static double decayed(IUpgradeTile tile, Upgrade upgrade) {
         int m = tile.getComponent().getUpgrades(Upgrade.SPEED);
@@ -64,7 +71,7 @@ public class UpgradeEffect {
         int f = upgrade == Upgrade.ENERGY ? MekanismTweaks.freeEnergy :
                 upgrade == Upgrade.GAS ? MekanismTweaks.freeGas : 0;
         int n = Math.max(m, f);
-        if (s == 0) return Math.min(x, n);
+        if (s == 0) return Math.min(x, n) / 8D;
         return (x <= n ? x : n + (x - n) / Math.max(1, Math.pow(m, Math.log(1 / s) / Math.log(2)) - 1)) / 8;
     }
 
@@ -73,6 +80,13 @@ public class UpgradeEffect {
      */
     public static double effect(double fraction) {
         return Math.pow(MekanismConfig.current().general.maxUpgradeMultiplier.val(), fraction);
+    }
+
+    /**
+     * Convert an effect multiplier back into an UpgradesInstalled fraction.
+     */
+    public static double inverseEffect(double effect) {
+        return Math.log(effect) / Math.log(MekanismConfig.current().general.maxUpgradeMultiplier.val());
     }
 
     /**

@@ -18,7 +18,10 @@ public class Temp {
 
     /**
      * Perform excess operations.
+     *
+     * @deprecated Use {@link #injectProgress(IOperationData, Runnable)}.
      */
+    @Deprecated
     public static void inject(int reqTime, Runnable operation) {
         if (!isInjecting.get()) {
             isInjecting.set(true);
@@ -37,7 +40,10 @@ public class Temp {
 
     /**
      * For Homoo. For she has no apparent operation method.
+     *
+     * @deprecated Digital Miner now uses {@link #injectProgress(IOperationData, Runnable)}.
      */
+    @Deprecated
     public static void injectHomoo(int reqTime, Runnable operation) {
         if (!isInjecting.get()) {
             isInjecting.set(true);
@@ -54,7 +60,7 @@ public class Temp {
         }
     }
 
-    public static void inject2(IOperationData data, Runnable operation) {
+    public static void injectProgress(IOperationData data, Runnable operation) {
         if (!isInjecting.get() && hasOperated.get()) {
             if (data.reqTime() < 0) {
 

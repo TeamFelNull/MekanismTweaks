@@ -25,7 +25,7 @@ public abstract class FluidicPlenisher implements IOperationData {
 
     @Inject(method = "onUpdate", at = @At(value = "TAIL"))
     public void handleExcessOperations(CallbackInfo ci) {
-        Temp.inject2(this, this::onUpdate);
+        Temp.injectProgress(this, this::onUpdate);
     }
 
     @Redirect(method = "onUpdate", at = @At(value = "FIELD", target = "Lmekanism/common/tile/TileEntityFluidicPlenisher;operatingTicks:I", opcode = Opcodes.PUTFIELD, ordinal = 1))

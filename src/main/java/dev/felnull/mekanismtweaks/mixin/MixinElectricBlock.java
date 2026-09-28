@@ -37,7 +37,7 @@ public abstract class MixinElectricBlock extends TileEntityContainerBlock {
     @Override
     public void recalculateUpgradables(Upgrade upgradeType) {
         super.recalculateUpgradables(upgradeType);
-        if (MekanismTweaks.energyBuffer && upgradeType == Upgrade.SPEED) {
+        if (MekanismTweaks.avoidExcessiveEnergyBuffer && upgradeType == Upgrade.SPEED) {
             maxEnergy = MekanismUtils.getMaxEnergy((IUpgradeTile) (Object) this, BASE_MAX_ENERGY);
             setEnergy(Math.min(getMaxEnergy(), getEnergy()));
         }

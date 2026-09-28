@@ -1,6 +1,7 @@
 package dev.felnull.mekanismtweaks.mixin.machine;
 
 import dev.felnull.mekanismtweaks.IOperationData;
+import dev.felnull.mekanismtweaks.MufflingEffect;
 import dev.felnull.mekanismtweaks.Temp;
 import mekanism.common.Upgrade;
 import mekanism.common.tile.TileEntityDigitalMiner;
@@ -29,9 +30,6 @@ public abstract class Homoo implements IOperationData {
     public int delay;
 
     @Shadow
-    public int delayLength;
-
-    @Shadow
     public TileComponentUpgrade upgradeComponent;
 
     @Shadow public abstract TileComponentUpgrade getComponent();
@@ -48,7 +46,7 @@ public abstract class Homoo implements IOperationData {
 
     @Inject(method = "onUpdate", at = @At("TAIL") /*@At(value = "INVOKE", target = "Lmekanism/common/tile/TileEntityChemicalDissolutionChamber;canOperate(Lmekanism/common/recipe/machines/DissolutionRecipe;)Z", ordinal = 1, shift = At.Shift.BY, by = -4)*/)
     public void handleExcessOperations(CallbackInfo ci) {
-        Temp.inject2(this, this::onUpdate);
+        Temp.injectProgress(this, this::onUpdate);
     }
 
     @Inject(method = "getPerTick", at = @At("HEAD"), cancellable = true)
@@ -66,22 +64,12 @@ public abstract class Homoo implements IOperationData {
 
     @Override
     public int opeTime() {
-        return getDelay() - delay;
+        return Math.max(0, getDelay() - delay);
     }
 
     @Override
     public void setOpeTime(int operatingTicks) {
         delay = getDelay() - operatingTicks;
-    }
-
-    @Override
-    public void addOpeTime(int opeTime) {
-        delay -= opeTime;
-    }
-
-    @Override
-    public void subOpeTime(int opeTime) {
-        delay += opeTime;
     }
 
     @Override
@@ -99,10 +87,11 @@ public abstract class Homoo implements IOperationData {
         upgradeComponent.setSupported(Upgrade.MUFFLING);
     }
 
-    @Redirect(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;func_175718_b(ILnet/minecraft/util/math/BlockPos;I)V"))
-    private void mufflerBreakBlockEffects(World instance, int i, BlockPos blockPos, int j) {
-        if (getComponent().getUpgrades(Upgrade.MUFFLING) != Upgrade.MUFFLING.getMax())
-            instance.playEvent(i, blockPos, j);
+    @Redirect(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playEvent(ILnet/minecraft/util/math/BlockPos;I)V", remap = true))
+    private void mufflerBreakBlockEffects(World instance, int type, BlockPos pos, int data) {
+        int max = Upgrade.MUFFLING.getMax();
+        int installed = getComponent().getUpgrades(Upgrade.MUFFLING);
+        if (installed < max)
+            instance.playEvent(type, pos, MufflingEffect.encode(data, installed, max));
     }
 }
-

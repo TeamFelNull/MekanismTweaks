@@ -31,7 +31,7 @@ public abstract class AdvancedElectricMachine {
 
     @Inject(method = "onUpdate", at = @At("TAIL"))
     public void handleExcessOperations(CallbackInfo ci) {
-        Temp.inject2((IOperationData) (Object)this, this::onUpdate);
+        Temp.injectProgress((IOperationData) (Object)this, this::onUpdate);
     }
 
     @Redirect(method = "onUpdate", at = @At(value = "FIELD", target = "Lmekanism/common/tile/prefab/TileEntityAdvancedElectricMachine;energyPerTick:D", opcode = Opcodes.GETFIELD))

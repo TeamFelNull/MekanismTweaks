@@ -33,7 +33,7 @@ Supported machines: electric machines (Enrichment Chamber, Crusher, ...), advanc
 | `maxEnergy` | 64 | Maximum Energy Upgrades installed. `2147483647` means unlimited. |
 | `maxGas` | 64 | Maximum Gas Upgrades installed. `2147483647` means unlimited. |
 | `maxMuffling` | 4 | Maximum Muffling Upgrades installed. |
-| `energyBuffer` | true | Avoid an excessive energy buffer: the buffer increment of surplus Energy Upgrades decays like their saving effect. |
+| `avoidExcessiveEnergyBuffer` | true | Avoid an excessive energy buffer: the buffer increment of surplus Energy Upgrades decays like their saving effect. |
 | `freeEnergy` / `freeGas` | 8 | Minimum number of Energy / Gas Upgrades whose effect never decays. |
 | `sustEnergy` / `sustGas` | 0.5 | How much of the Energy / Gas Upgrades' effect is sustained against the Speed Upgrades. At 1 nothing decays (as in vanilla Mekanism); at 0 the effect decays fully. At 0.5, overcoming the Speed Upgrades needs upgrades of at least their square. |
 
@@ -41,10 +41,13 @@ The effect per 8 upgrades is Mekanism's own `UpgradeModifier` (`mekanism.cfg`).
 
 ## Building
 
-Requires JDK 8 (ForgeGradle 2.3 with Gradle 4.9).
+Requires a full JDK 8 installation, not a JRE (ForgeGradle 2.3 with Gradle 4.9).
+
+Set JDK 8 as `JAVA_HOME` or as the Gradle JVM in your IDE. Do not add a machine-specific `org.gradle.java.home` path to `gradle.properties`.
 
 - `./gradlew build` — the jar is written to `build/libs/`. Mekanism is downloaded from [CurseMaven](https://www.cursemaven.com/) automatically.
 - `./gradlew runClient` / `./gradlew runServer` to try it in a development environment.
+- `./gradlew idea` — generates IntelliJ metadata and attaches the matching Mekanism sources, so Find in Files can search dependency code with the `Project and Libraries` scope.
 
 `libs/compile-api-stubs.jar` only holds empty interfaces of the optional IC2, CoFH and ComputerCraft APIs that Mekanism's classes implement, so that the classes can be compiled against.
 

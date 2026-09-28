@@ -9,12 +9,13 @@
     "MixinElectricBlock",
     "MixinItemUpgrade",
     "MixinMekanismUtils",
+    "MixinPacketRemoveUpgrade",
     "MixinStatUtils",
+    "MixinTileComponentUpgrade",
     "MixinUpgrade",
     "machine.ChemicalDissolutionChamber",
     "machine.ElectricPump",
     "machine.Factory",
-    "machine.FormulaicAssemblicatorGui",
     "machine.FluidicPlenisher",
     "machine.FormulaicAssemblicator",
     "machine.Homoo",
@@ -30,6 +31,7 @@
   ],
   "client": [
     "MixinGuiUpgradeManagement",
+    "MixinRenderGlobal",
     "machine.FormulaicAssemblicatorGui"
   ],
   "server": []
