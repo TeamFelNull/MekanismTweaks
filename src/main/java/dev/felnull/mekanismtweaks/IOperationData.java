@@ -22,7 +22,6 @@ public interface IOperationData {
         setOpeTime(this.opeTime() - opeTime);
     }
 
-
     /**
      * Display excess progress as well.
      */

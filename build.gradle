@@ -1,86 +1,100 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven {
-            name "forge"
-            url "https://files.minecraftforge.net/maven"
-        }
+import org.jetbrains.gradle.ext.Gradle
 
-        maven { url = "https://repo.spongepowered.org/maven" }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
-    }
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1.8'
+    id 'com.gtnewhorizons.retrofuturagradle' version '1.4.9'
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
 
 version = mod_version
 group = mod_group
-archivesBaseName = "$mod_id-$minecraft_version"
 
-def mekanismSourcesCommit = '321afd497c19e0051143035cfdc7de999aef8c3d'
-def mekanismSourcesArchive = file("${gradle.gradleUserHomeDir}/caches/mekanism-sources/Mekanism-${mekanism_version}-${mekanismSourcesCommit}.zip")
+base {
+    archivesName = "${mod_id}-${minecraft_version}"
+}
 
-sourceCompatibility = targetCompatibility = '1.8'
-tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+        vendor = JvmVendorSpec.AZUL
+    }
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
 
 minecraft {
-    version "1.12.2-14.23.5.2847"
-    runDir = "run"
-    mappings = mappings_version
+    mcVersion = minecraft_version
+    mcpMappingChannel = 'stable'
+    mcpMappingVersion = mappings_version.replace('stable_', '')
+    username = 'Developer'
 }
 
-tasks.withType(JavaExec) {
-    if (name == 'runClient' || name == 'runServer') {
-        jvmArgs '-Dfml.coreMods.load=dev.felnull.mekanismtweaks.MekanismTweaks'
+['runClient', 'runServer'].each { runTask ->
+    tasks.named(runTask) {
+        extraJvmArgs.add("-Dfml.coreMods.load=${mod_core_plugin.replace('${mod_group}', mod_group)}")
     }
 }
 
 repositories {
     mavenCentral()
-    maven { url = "https://repo.spongepowered.org/maven" }
-
-
     maven {
-        url "https://cursemaven.com"
+        name = 'CleanroomMC'
+        url = 'https://maven.cleanroommc.com'
     }
     maven {
-        name = "ModMaven"
-        url = "https://modmaven.k-4u.nl"
+        name = 'CurseMaven'
+        url = 'https://cursemaven.com'
     }
-
     maven {
-        name 'ForgeFS'
-        url 'https://maven.minecraftforge.net/'
+        name = 'ModMaven'
+        url = 'https://modmaven.k-4u.nl'
     }
-}
-
-configurations {
-    embed
-    compile.extendsFrom(embed)
 }
 
 dependencies {
-
-    embed('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
-        exclude module: 'guava'
-        exclude module: 'commons-io'
-        exclude module: 'gson'
+    String mixin = modUtils.enableMixins('zone.rong:mixinbooter:11.17', mod_mixin_refmap.replace('${mod_id}', mod_id))
+    implementation(mixin) {
+        transitive = false
     }
+    annotationProcessor mixin
 
-    deobfCompile 'curse.maven:Mekanism-268560:2835175'
+    api(rfg.deobf('curse.maven:Mekanism-268560:2835175'))
     compileOnly files('libs/compile-api-stubs.jar')
-    runtime 'mezz.jei:jei_1.12.2:4.16.1.302'
+    runtimeOnly 'mezz.jei:jei_1.12.2:4.16.1.302'
+    // Test-world utilities only; neither dependency is bundled into MekanismTweaks.
+    runtimeOnly(rfg.deobf('curse.maven:supermartijn642s-core-lib-454372:4660085'))
+    runtimeOnly(rfg.deobf('curse.maven:trash-cans-394535:4606884'))
 }
 
-task prepareMekanismSources {
+processResources {
+    inputs.property 'version', project.version
+    inputs.property 'mcversion', minecraft_version
+
+    filesMatching('mcmod.info') {
+        expand 'mod_id': mod_id, 'mod_name': mod_name, 'version': project.version,
+                'mcversion': minecraft_version, 'mod_description': mod_description,
+                'mod_author': mod_author
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+                'FMLCorePlugin': mod_core_plugin.replace('${mod_group}', mod_group),
+                'FMLCorePluginContainsFMLMod': 'true',
+                'MixinConfigs': mod_mixin_config.replace('${mod_id}', mod_id),
+        )
+    }
+}
+
+def mekanismSourcesCommit = '321afd497c19e0051143035cfdc7de999aef8c3d'
+def mekanismSourcesArchive = file("${gradle.gradleUserHomeDir}/caches/mekanism-sources/Mekanism-${mekanism_version}-${mekanismSourcesCommit}.zip")
+
+tasks.register('prepareMekanismSources') {
     description = 'Downloads the matching Mekanism sources for IntelliJ library search/navigation.'
     group = 'IDE'
     outputs.file mekanismSourcesArchive
@@ -99,57 +113,68 @@ task prepareMekanismSources {
 idea {
     module {
         downloadSources = true
+        downloadJavadoc = true
+        inheritOutputDirs = true
         iml {
             withXml {
-                def sourceUrl = "jar://${mekanismSourcesArchive.absolutePath.replace('\\', '/')}!/Mekanism-${mekanismSourcesCommit}/src/main/java"
+                def sourceUrl = "jar://${mekanismSourcesArchive.absolutePath.replace('\\', '/')}!/Mekanism-${mekanismSourcesCommit}/src/main/java/"
                 def libraries = it.asNode().component.orderEntry.library
                 def mekanismLibrary = libraries.find { library ->
-                    library.CLASSES.root.any { root -> root.@url.toString().contains('Mekanism-268560-2835175.jar') }
+                    library.CLASSES.root.any { root -> root.@url.toString().contains('Mekanism-268560-2835175') }
                 }
-
                 if (mekanismLibrary) {
                     mekanismLibrary.SOURCES[0].children().clear()
                     mekanismLibrary.SOURCES[0].appendNode('root', [url: sourceUrl])
+                }
+
+                // RFG's generated .iml omits the Minecraft/Forge classes that compileJava uses.
+                def minecraftJar = file("${buildDir}/rfg/recompiled_minecraft-${minecraft_version}.jar")
+                def minecraftSources = file("${buildDir}/rfg/mcp_patched_ated_minecraft-sources.jar")
+                def minecraftUrl = "jar://${minecraftJar.absolutePath.replace('\\', '/')}!/"
+                def sourcesUrl = "jar://${minecraftSources.absolutePath.replace('\\', '/')}!/"
+                def moduleRoot = it.asNode().component.find { component -> component.@name == 'NewModuleRootManager' }
+                def minecraftLibrary = moduleRoot.appendNode('orderEntry', [type: 'module-library']).appendNode('library')
+                minecraftLibrary.appendNode('CLASSES').appendNode('root', [url: minecraftUrl])
+                minecraftLibrary.appendNode('JAVADOC')
+                minecraftLibrary.appendNode('SOURCES').appendNode('root', [url: sourcesUrl])
+            }
+        }
+    }
+    project {
+        settings {
+            runConfigurations {
+                '0. Setup Decomp Workspace'(Gradle) {
+                    taskNames = ['setupDecompWorkspace']
+                }
+                '1. Run Client'(Gradle) {
+                    taskNames = ['runClient']
+                }
+                '2. Run Server'(Gradle) {
+                    taskNames = ['runServer']
+                }
+                '3. Run Obfuscated Client'(Gradle) {
+                    taskNames = ['runObfClient']
+                }
+                '4. Run Obfuscated Server'(Gradle) {
+                    taskNames = ['runObfServer']
+                }
+            }
+            compiler.javac {
+                afterEvaluate {
+                    javacAdditionalOptions = '-encoding utf8'
+                    moduleJavacAdditionalOptions = [
+                            (project.name + '.main'): tasks.compileJava.options.compilerArgs.collect { '"' + it + '"' }.join(' ')
+                    ]
                 }
             }
         }
     }
 }
 
-ideaModule.dependsOn prepareMekanismSources
-
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        expand 'mod_id': mod_id, 'mod_name': mod_name, 'version': project.version,
-                'mcversion': project.minecraft.version, 'mod_description': mod_description,
-                'mod_author': mod_author
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+tasks.named('ideaModule').configure {
+    dependsOn tasks.named('prepareMekanismSources'), tasks.named('packagePatchedMc')
 }
 
-mixin {
-    add sourceSets.main, mod_mixin_refmap.replace('${mod_id}', mod_id)
+tasks.named('processIdeaSettings').configure {
+    dependsOn tasks.named('prepareMekanismSources')
 }
-
-jar {
-    from {
-        configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
-
-    manifest {
-        attributes(
-                "FMLCorePlugin": mod_core_plugin.replace('${mod_group}', mod_group),
-                "FMLCorePluginContainsFMLMod": "true",
-        )
-    }
-}
-jar.finalizedBy('reobfJar')

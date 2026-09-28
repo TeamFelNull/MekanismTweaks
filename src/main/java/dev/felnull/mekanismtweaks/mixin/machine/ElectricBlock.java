@@ -1,4 +1,4 @@
-package dev.felnull.mekanismtweaks.mixin;
+package dev.felnull.mekanismtweaks.mixin.machine;
 
 import dev.felnull.mekanismtweaks.MekanismTweaks;
 import mekanism.common.Upgrade;
@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(value = TileEntityElectricBlock.class, remap = false)
-public abstract class MixinElectricBlock extends TileEntityContainerBlock {
+public abstract class ElectricBlock extends TileEntityContainerBlock {
 
     @Shadow
     public double maxEnergy;
@@ -27,7 +27,7 @@ public abstract class MixinElectricBlock extends TileEntityContainerBlock {
     @Shadow
     public abstract double getEnergy();
 
-    public MixinElectricBlock(String name) {
+    public ElectricBlock(String name) {
         super(name);
     }
 
@@ -38,7 +38,7 @@ public abstract class MixinElectricBlock extends TileEntityContainerBlock {
     public void recalculateUpgradables(Upgrade upgradeType) {
         super.recalculateUpgradables(upgradeType);
         if (MekanismTweaks.avoidExcessiveEnergyBuffer && upgradeType == Upgrade.SPEED) {
-            maxEnergy = MekanismUtils.getMaxEnergy((IUpgradeTile) (Object) this, BASE_MAX_ENERGY);
+            maxEnergy = MekanismUtils.getMaxEnergy((IUpgradeTile) this, BASE_MAX_ENERGY);
             setEnergy(Math.min(getMaxEnergy(), getEnergy()));
         }
     }

@@ -34,7 +34,7 @@ public abstract class MixinUpgrade {
     public void fixEffectInfo(Args args, IUpgradeTile tile) {
         Upgrade upgrade = (Upgrade) (Object) this;
         double effect = UpgradeEffect.effect(
-                upgrade == Upgrade.ENERGY || upgrade == Upgrade.GAS ? UpgradeEffect.decayed(tile, upgrade) :
+                upgrade == Upgrade.ENERGY || upgrade == Upgrade.GAS ? UpgradeEffect.decayedFraction(tile, upgrade) :
                 UpgradeEffect.fraction(tile, upgrade));
         args.set(0, ((String) args.get(0)).replaceFirst("(?<=: ).*(?=x)", UpgradeEffect.exponential(effect)));
     }

@@ -32,6 +32,5 @@ public class OperationalMachine implements IOperationData {
     @Inject(method = "getScaledProgress", at = @At("HEAD"), cancellable = true)
     public void getScaledProgress(CallbackInfoReturnable<Double> cir) {
         cir.setReturnValue(getScaledOpeTime());
-        cir.cancel();
     }
 }

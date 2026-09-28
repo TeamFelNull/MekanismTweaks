@@ -1,12 +1,12 @@
 {
   "required": true,
   "compatibilityLevel": "JAVA_8",
-  "minVersion": "0.7.11",
+  "minVersion": "0.8.7",
   "package": "dev.felnull.mekanismtweaks.mixin",
   "refmap": "mekanismtweaks.refmap.json",
   "mixins": [
     "MixinChargeUtils",
-    "MixinElectricBlock",
+    "machine.ElectricBlock",
     "MixinItemUpgrade",
     "MixinMekanismUtils",
     "MixinPacketRemoveUpgrade",
@@ -30,7 +30,9 @@
     "machine.operational.PRC"
   ],
   "client": [
+    "MixinGuiEnergyInfo",
     "MixinGuiUpgradeManagement",
+    "MixinParticleManager",
     "MixinRenderGlobal",
     "machine.FormulaicAssemblicatorGui"
   ],

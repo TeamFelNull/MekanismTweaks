@@ -3,7 +3,7 @@ package dev.felnull.mekanismtweaks.mixin.machine.operational;
 import dev.felnull.mekanismtweaks.IOperationData;
 import dev.felnull.mekanismtweaks.Temp;
 import mekanism.common.tile.prefab.TileEntityAdvancedElectricMachine;
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,12 +26,12 @@ public abstract class AdvancedElectricMachine {
 
     @Redirect(method = "onUpdate", at = @At(value = "FIELD", target = "Lmekanism/common/tile/prefab/TileEntityAdvancedElectricMachine;operatingTicks:I", opcode = Opcodes.PUTFIELD, ordinal = 1))
     private void modifyOperatingTicksLater(TileEntityAdvancedElectricMachine instance, int value) {
-        Temp.modifyOperatingTicksLater((IOperationData) (Object) instance, value);
+        Temp.modifyOperatingTicksLater((IOperationData) instance, value);
     }
 
     @Inject(method = "onUpdate", at = @At("TAIL"))
     public void handleExcessOperations(CallbackInfo ci) {
-        Temp.injectProgress((IOperationData) (Object)this, this::onUpdate);
+        Temp.injectProgress((IOperationData) this, this::onUpdate);
     }
 
     @Redirect(method = "onUpdate", at = @At(value = "FIELD", target = "Lmekanism/common/tile/prefab/TileEntityAdvancedElectricMachine;energyPerTick:D", opcode = Opcodes.GETFIELD))

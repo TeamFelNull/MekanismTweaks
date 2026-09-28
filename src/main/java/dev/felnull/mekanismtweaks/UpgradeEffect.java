@@ -1,8 +1,11 @@
 package dev.felnull.mekanismtweaks;
 
+import joptsimple.internal.Strings;
 import mekanism.common.Upgrade;
 import mekanism.common.base.IUpgradeTile;
 import mekanism.common.config.MekanismConfig;
+
+import java.text.DecimalFormat;
 
 public class UpgradeEffect {
 
@@ -19,16 +22,16 @@ public class UpgradeEffect {
      * Required ticks per operation.
      * Extends the speed effect of Speed Upgrades. When performing multiple operations per tick, excess progress is represented as negative required ticks (-20 per extra operation).
      * Interpolation smooths speed scaling while minimizing significant performance regressions when updating to v1.2.
+     *
      * @see <a href="https://www.desmos.com/calculator/fk7mk2t9hq?lang=ja">speed upgrade effect (Desmos)</a>
      */
     public static int speed(IUpgradeTile tile, int def) {
         double speedFraction = fraction(tile, Upgrade.SPEED);
         double ticks = def * effect(-speedFraction);
-        if (ticks > 2)
-            return (int) Math.floor(ticks);
+        if (ticks > 2) return (int) Math.floor(ticks);
 
         double excess = Math.pow(2, Math.max(inverseEffect(def / 2.) + 1 - speedFraction, 0)) / ticks - 1;
-        return (int) -Math.min(Integer.MAX_VALUE / 2, Math.ceil(20 * excess));
+        return (int) -Math.ceil(20 * excess);
     }
 
     /**
@@ -37,7 +40,7 @@ public class UpgradeEffect {
      * The energy-saving effect of excess EnergyUpgrades decays based on the SpeedUpgradesInstalled.
      */
     public static double energy(IUpgradeTile tile, double def) {
-        return def * effect(2 * fraction(tile, Upgrade.SPEED) - decayed(tile, Upgrade.ENERGY));
+        return def * effect(2 * fraction(tile, Upgrade.SPEED) - decayedFraction(tile, Upgrade.ENERGY));
     }
 
     /**
@@ -45,7 +48,7 @@ public class UpgradeEffect {
      * If necessary, the energy-buffer increment of excess EnergyUpgrades decays based on the SpeedUpgradesInstalled.
      */
     public static double energyBuffer(IUpgradeTile tile, double def) {
-        return def * effect(MekanismTweaks.avoidExcessiveEnergyBuffer ? decayed(tile, Upgrade.ENERGY) : fraction(tile, Upgrade.ENERGY));
+        return def * effect(MekanismTweaks.avoidExcessiveEnergyBuffer ? decayedFraction(tile, Upgrade.ENERGY) : fraction(tile, Upgrade.ENERGY));
     }
 
     /**
@@ -53,26 +56,25 @@ public class UpgradeEffect {
      * The gas-saving effect of excess GasUpgrades decays based on the SpeedUpgradesInstalled.
      */
     public static double gas(IUpgradeTile tile, int def) {
-        if (tile.getComponent().supports(Upgrade.GAS))
-            return def * effect(2 * fraction(tile, Upgrade.SPEED) - decayed(tile, Upgrade.GAS));
-        else
-            return def * effect(fraction(tile, Upgrade.SPEED));
+        return def * effect(tile.getComponent().supports(Upgrade.GAS) ? 2 * fraction(tile, Upgrade.SPEED) - decayedFraction(tile, Upgrade.GAS) : fraction(tile, Upgrade.SPEED));
     }
 
     /**
      * Decayed UpgradesInstalled fraction.
-     * @see <a href="https://www.desmos.com/calculator/bc5e1bd598?lang=ja">saving effect (Desmos)</a>
+     *
+     * @see <a href="https://www.desmos.com/calculator/bc5e1bd598?lang=ja">decaying effect (Desmos)</a>
      */
-    public static double decayed(IUpgradeTile tile, Upgrade upgrade) {
+    public static double decayedFraction(IUpgradeTile tile, Upgrade upgrade) {
+        if (upgrade != Upgrade.ENERGY && upgrade != Upgrade.GAS) return fraction(tile, upgrade);
+
         int m = tile.getComponent().getUpgrades(Upgrade.SPEED);
+        int f = upgrade == Upgrade.ENERGY ? MekanismTweaks.freeEnergy : MekanismTweaks.freeGas;
+        int n = Math.max(m, f); // non-decay limit
         int x = tile.getComponent().getUpgrades(upgrade);
-        double s = upgrade == Upgrade.ENERGY ? MekanismTweaks.sustEnergy :
-                   upgrade == Upgrade.GAS ? MekanismTweaks.sustGas : 0;
-        int f = upgrade == Upgrade.ENERGY ? MekanismTweaks.freeEnergy :
-                upgrade == Upgrade.GAS ? MekanismTweaks.freeGas : 0;
-        int n = Math.max(m, f);
-        if (s == 0) return Math.min(x, n) / 8D;
-        return (x <= n ? x : n + (x - n) / Math.max(1, Math.pow(m, Math.log(1 / s) / Math.log(2)) - 1)) / 8;
+        double s = upgrade == Upgrade.ENERGY ? MekanismTweaks.sustEnergy : MekanismTweaks.sustGas;
+
+        double sustainRate = s == 0 ? 0 : 1 / Math.max(1, Math.pow(n, Math.log(1 / s) / Math.log(2)) - 1);
+        return (x <= n ? x : n + (x - n) * sustainRate) / 8;
     }
 
     /**
@@ -93,11 +95,8 @@ public class UpgradeEffect {
      * Appropriate exponential notation.
      */
     public static String exponential(double d) {
-        int significant = 4;
-        int exp = (int) Math.floor(Math.log10(d));
-        d = d * Math.pow(10, -exp);//1.ナニナニ
-        d = (double) ((int) Math.round(d * Math.pow(10, significant - 1))) / Math.pow(10, significant - 1);//有効数字で四捨五入
-        double dt = (double) ((int) Math.round(d * Math.pow(10, significant - 1))) / Math.pow(10, significant - 1 - exp);//なぜかこれだと誤差なし
-        return Math.abs(exp) <= significant - 1 ? String.valueOf(dt) : d + "E" + exp;
+        int exp = d == 0 ? 0 : (int) Math.floor(Math.log10(Math.abs(d)));
+        if (Math.abs(exp) > 3) return new DecimalFormat("0.000E0").format(d);
+        return new DecimalFormat(exp >= 3 ? "0" : "0." + "000".substring(Math.max(exp, 0))).format(d);
     }
 }

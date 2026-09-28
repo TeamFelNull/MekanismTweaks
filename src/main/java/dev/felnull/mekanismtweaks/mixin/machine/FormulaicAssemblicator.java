@@ -3,7 +3,7 @@ package dev.felnull.mekanismtweaks.mixin.machine;
 import dev.felnull.mekanismtweaks.IOperationData;
 import dev.felnull.mekanismtweaks.Temp;
 import mekanism.common.tile.TileEntityFormulaicAssemblicator;
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Invoker;

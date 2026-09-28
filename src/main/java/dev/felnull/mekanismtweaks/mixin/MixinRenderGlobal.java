@@ -1,64 +1,37 @@
 package dev.felnull.mekanismtweaks.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import dev.felnull.mekanismtweaks.MufflingEffect;
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import mekanism.common.Upgrade;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleDigging;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(RenderGlobal.class)
 public class MixinRenderGlobal {
 
-    @Shadow
-    private WorldClient world;
+    @ModifyArg(method = "playEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;getStateById(I)Lnet/minecraft/block/state/IBlockState;"), index = 0)
+    private int unmaskBreakSoundState(int data) {
+        return MufflingEffect.isEncoded(data) ? MufflingEffect.getVanillaData(data) : data;
+    }
 
-    @Shadow
-    private Minecraft mc;
+    @ModifyArg(method = "playEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/WorldClient;playSound(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/SoundEvent;Lnet/minecraft/util/SoundCategory;FFZ)V"), index = 3,
+                slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;getBlockById(I)Lnet/minecraft/block/Block;"),
+                                 to = @At(value = "INVOKE", target = "Lnet/minecraft/client/particle/ParticleManager;addBlockDestroyEffects(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)V")))
+    private float scaleBreakSound(float volume, @Local(argsOnly = true, ordinal = 1) int data) {
+        return volume * (MufflingEffect.isEncoded(data) ? Math.max(0, 1 - (float) MufflingEffect.getMuffling(data) / Upgrade.MUFFLING.getMax()) : 1);
+    }
 
-    @Inject(method = "playEvent", at = @At("HEAD"), cancellable = true)
-    private void renderMuffledBreakEffect(EntityPlayer player, int type, BlockPos pos, int data, CallbackInfo ci) {
-        if (type != 2001 || !MufflingEffect.isEncoded(data))
-            return;
-
-        int blockState = MufflingEffect.getBlockState(data);
-        float scale = MufflingEffect.getScale(data);
-        Block block = Block.getBlockById(blockState & 4095);
-        IBlockState state = block.getStateFromMeta(blockState >> 12 & 255);
-
-        if (scale > 0 && block.getDefaultState().getMaterial() != Material.AIR) {
-            SoundType sound = block.getSoundType(Block.getStateById(blockState), world, pos, null);
-            world.playSound(pos, sound.getBreakSound(), SoundCategory.BLOCKS, (sound.getVolume() + 1) / 2 * scale, sound.getPitch() * 0.8F, false);
-        }
-
-        if (scale > 0 && !block.isAir(state, world, pos) && !block.addDestroyEffects(world, pos, mc.effectRenderer)) {
-            state = state.getActualState(world, pos);
-            int particles = Math.round(64 * scale);
-            for (int i = 0; i < particles; i++) {
-                int cell = i * 37 & 63;
-                double x = ((cell >> 4) + 0.5) / 4;
-                double y = (((cell >> 2) & 3) + 0.5) / 4;
-                double z = ((cell & 3) + 0.5) / 4;
-                Particle particle = mc.effectRenderer.spawnEffectParticle(EnumParticleTypes.BLOCK_CRACK.getParticleID(),
-                        pos.getX() + x, pos.getY() + y, pos.getZ() + z,
-                        x - 0.5, y - 0.5, z - 0.5, Block.getStateId(state));
-                if (particle instanceof ParticleDigging)
-                    ((ParticleDigging) particle).setBlockPos(pos);
-            }
-        }
-        ci.cancel();
+    @WrapOperation(method = "playEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/particle/ParticleManager;addBlockDestroyEffects(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)V"))
+    private void scaleBreakParticles(ParticleManager instance, BlockPos pos, IBlockState state,
+                                     Operation<Void> original, @Local(argsOnly = true, ordinal = 1) int data) {
+        MufflingEffect.withParticleContext(data, () -> original.call(instance, pos, state));
     }
 }

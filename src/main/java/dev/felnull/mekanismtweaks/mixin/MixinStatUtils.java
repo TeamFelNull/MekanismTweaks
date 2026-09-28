@@ -1,6 +1,9 @@
 package dev.felnull.mekanismtweaks.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import mekanism.common.util.StatUtils;
+import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -19,20 +22,15 @@ public class MixinStatUtils {
     /**
      * In the default implementation, when the mean is too high like 1000, the upper limit is capped at Infinity, which decrease gas per tick as SpeedUpgradeInstalled.
      */
-    @Inject(method = "inversePoisson", at = @At("HEAD"), cancellable = true)
-    private static void avoidOverflow(double mean, CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(samplePoisson(mean));
-    }
-
-    @Unique
-    private static int samplePoisson(double mean) {
+    @WrapMethod(method = "inversePoisson")
+    private static int avoidOverflow(double mean, Operation<Integer> original) {
         if (mean >= 1000000) {
             // Cornish-Fisher corrected normal approximation.
             double z = rand.nextGaussian(), sigma = Math.sqrt(mean);
             long sample = Math.round(mean + sigma * z
                     + (z * z - 1) / 6
                     + (z - z * z * z) / (72 * sigma));
-            return (int) Math.min(Integer.MAX_VALUE, Math.max(0L, sample));
+            return (int) MathHelper.clamp(sample, 0, Integer.MAX_VALUE);
         }
 
         int m = (int) mean;

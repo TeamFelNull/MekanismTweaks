@@ -4,7 +4,7 @@ package dev.felnull.mekanismtweaks.mixin.machine;
 import dev.felnull.mekanismtweaks.IOperationData;
 import dev.felnull.mekanismtweaks.Temp;
 import mekanism.common.tile.TileEntityFluidicPlenisher;
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,7 +30,7 @@ public abstract class FluidicPlenisher implements IOperationData {
 
     @Redirect(method = "onUpdate", at = @At(value = "FIELD", target = "Lmekanism/common/tile/TileEntityFluidicPlenisher;operatingTicks:I", opcode = Opcodes.PUTFIELD, ordinal = 1))
     private void modifyOperatingTicksLater(TileEntityFluidicPlenisher instance, int value) {
-        Temp.modifyOperatingTicksLater((IOperationData) (Object) instance, value);
+        Temp.modifyOperatingTicksLater((IOperationData) instance, value);
     }
 
     @Redirect(method = "onUpdate", at = @At(value = "FIELD", target = "Lmekanism/common/tile/TileEntityFluidicPlenisher;energyPerTick:D", opcode = Opcodes.GETFIELD))

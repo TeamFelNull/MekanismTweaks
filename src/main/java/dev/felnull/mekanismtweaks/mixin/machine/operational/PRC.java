@@ -5,7 +5,7 @@ import dev.felnull.mekanismtweaks.Temp;
 import mekanism.common.base.IUpgradeTile;
 import mekanism.common.tile.TileEntityPRC;
 import mekanism.common.util.MekanismUtils;
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,12 +26,12 @@ public abstract class PRC {
 
     @Inject(method = "onUpdate", at = @At(value = "TAIL"))
     public void handleExcessOperations(CallbackInfo ci) {
-        Temp.injectProgress((IOperationData)this, this::onUpdate);
+        Temp.injectProgress((IOperationData) this, this::onUpdate);
     }
 
     @Redirect(method = "onUpdate", at = @At(value = "FIELD", target = "Lmekanism/common/tile/TileEntityPRC;operatingTicks:I", opcode = Opcodes.PUTFIELD, ordinal = 1))
     private void modifyOperatingTicksLater(TileEntityPRC instance, int value) {
-        Temp.modifyOperatingTicksLater((IOperationData) (Object)instance, value);
+        Temp.modifyOperatingTicksLater((IOperationData) instance, value);
     }
 
     @Redirect(method = "onUpdate", at = @At(value = "INVOKE", target = "Lmekanism/common/util/MekanismUtils;getEnergyPerTick(Lmekanism/common/base/IUpgradeTile;D)D"))
